@@ -50,11 +50,10 @@ class Students extends \Http\Controller {
                 break;
 
             case 'approve';
-                $student = $this->getStudent($student->id);
                 $student->submitted   = 0;
-                $student->live_profile_pic = $student->profile_pic;
-                $student->live_summary = $student->summary;
-                $student->live_story  = $student->story;
+                $student->live_profile_pic = $request->profile_pic;
+                $student->live_summary = $request->summary;
+                $student->live_story  = $request->story;
                 \ResourceFactory::saveResource($student);
                 break;
         }
@@ -98,6 +97,9 @@ class Students extends \Http\Controller {
                 case 'student':
                     $data['student'] = $this->getStudent($request->getVar('id'));
                     break;
+                case 'link':
+                    $data['link'] = $this->getStudentLink($request->getVar('id'));
+                    break;
             }
         } else {
             $db             = \Database::newDB();
@@ -126,10 +128,10 @@ class Students extends \Http\Controller {
     }
 
     private function getStudent($student_name)
-    {   
-        $name = explode('-', $student_name);
+    {
         $db = \Database::newDB();
         $co = $db->addTable('always_student');
+        $name = explode('-', $student_name);
         $db->setConditional($co->getFieldconditional('first_name', $name[0]));
         $db->setConditional($co->getFieldconditional('last_name', $name[1]));
         $result = $db->select();
@@ -145,7 +147,19 @@ class Students extends \Http\Controller {
 
         return $result[0];
     }
-
+    
+    private function getStudentLink($student_id)
+    {   
+        $db = \Database::newDB();
+        $co = $db->addTable('always_student');
+        $db->setConditional($co->getFieldconditional('id', $student_id));
+        $result = $db->select();
+        if (empty($result[0])) {
+            return null;
+        }
+        $lastDashFirst = $result[0]['first_name'].'-'.$result[0]['last_name'];
+        return strtolower($lastDashFirst);
+    }
 }
 
 ?>

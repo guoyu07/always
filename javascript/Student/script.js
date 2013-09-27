@@ -49,15 +49,26 @@ function student() {
         $('.pager-row').click(function() {
             $this.student_id = $(this).data('rowId');
             $('#student-name').val($('.name', this).html());
-            student.test();
+            student.redirect();
         });
     };
 
-    this.test = function() {
+    this.redirect = function() {
         $this = this;
-        $.get('always/admin/students/?command=student', {'student_id': this.student_id},
-        console.debug($this);
+        $.get('always/admin/students/?command=link', {'id': this.student_id},
+        function(data) {
+            var current = location.href;
+
+            //A hotfix for url issues.
+            if (current.slice(-1) != '/')
+                {
+                    current = current + '/';
+                }
+
+            window.location.assign(current + data.link);
+        }, 'json');
     };
+
 
     this.popup = function() {
         $this = this;
