@@ -53,12 +53,6 @@ function student() {
         });
     };
 
-    this.test = function() {
-        $this = this;
-        $.get('always/admin/students/?command=student', {'student_id': this.student_id},
-        console.debug($this);
-    };
-
     this.popup = function() {
         $this = this;
         $('#delete-approval').attr('checked', false);

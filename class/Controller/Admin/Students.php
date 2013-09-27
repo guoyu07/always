@@ -34,14 +34,14 @@ class Students extends \Http\Controller {
         $student->id = $request->getVar('student_id');
         switch ($request->getVar('command')) {
             case 'save':
-                $student->first_name  = $request->getVar('first_name');
-                $student->last_name   = $request->getVar('last_name');
-                $student->class_date  = $request->getVar('class_date');
-                $student->bg          = $request->getVar('bg');
+                $student->first_name = $request->getVar('first_name');
+                $student->last_name = $request->getVar('last_name');
+                $student->class_date = $request->getVar('class_date');
+                $student->bg = $request->getVar('bg');
                 $student->profile_pic = $request->getVar('profile_pic');
-                $student->story       = $request->getVar('story');
-                $student->summary     = $request->getVar('summary');
-                $student->submitted   = 1;
+                $student->story = $request->getVar('story');
+                $student->summary = $request->getVar('summary');
+                $student->submitted = 1;
                 \ResourceFactory::saveResource($student);
                 break;
 
@@ -51,10 +51,10 @@ class Students extends \Http\Controller {
 
             case 'approve';
                 $student = $this->getStudent($student->id);
-                $student->submitted   = 0;
+                $student->submitted = 0;
                 $student->live_profile_pic = $student->profile_pic;
                 $student->live_summary = $student->summary;
-                $student->live_story  = $student->story;
+                $student->live_story = $student->story;
                 \ResourceFactory::saveResource($student);
                 break;
         }
@@ -71,16 +71,23 @@ class Students extends \Http\Controller {
                 PHPWS_SOURCE_HTTP . "mod/always/javascript/Student/script.js'></script>");
         \Layout::addStyle('always', 'style.css');
         $data['menu'] = $this->menu->get($request);
+
+        $cmd = $request->shiftCommand();
+
         $template = new \Template();
 
-        $nrequest = $request->getNextRequest();
-        $nnrequest = $nrequest->getNextRequest();
-        $token = $nnrequest->getCurrentToken();
-        if ($token == '/') {
-            $template->setModuleTemplate('always', 'Admin/Students/List.html');
-        } else {
-            $template->setModuleTemplate('always', 'Admin/Students/Student.html');
-            $data = array_merge((array)$data, (array)$this->getStudent($token));
+        switch ($cmd) {
+            case 'admin':
+                $template->setModuleTemplate('always',
+                        'Admin/Students/List.html');
+                break;
+
+            default:
+                $template->setModuleTemplate('always',
+                        'Admin/Students/Student.html');
+                $data = array_merge((array) $data,
+                        (array) $this->getStudent($cmd));
+                break;
         }
         $template->addVariables($data);
         //var_dump($template);
@@ -97,16 +104,15 @@ class Students extends \Http\Controller {
                     break;
             }
         } else {
-            $db             = \Database::newDB();
-            $student        = $db->addTable('always_student');
-            $id             = $student->addField('id');
-            $first_name     = $student->addField('first_name');
-            $last_name      = $student->addField('last_name');
-            $class_date     = $student->addField('class_date');
+            $db = \Database::newDB();
+            $student = $db->addTable('always_student');
+            $id = $student->addField('id');
+            $first_name = $student->addField('first_name');
+            $last_name = $student->addField('last_name');
+            $class_date = $student->addField('class_date');
             //$ct = $db->addTable('rd_ctocollege');
             //$col_id = $ct->addField('college_id', 'assigned');
             //$col_id->showCount();
-
             //$db->join($college->getField('id'), $col_id, 'left');
             $db->setGroupBy($last_name);
             $pager = new \DatabasePager($db);
@@ -138,7 +144,8 @@ class Students extends \Http\Controller {
         if ($result[0]['submitted']) {
             $result[0]['approve'] = '<button type="submit" class="btn btn-primary" name="command" value="approve" />Approve</button>';
         }
-        else $result[0]['approve'] = "";
+        else
+            $result[0]['approve'] = "";
 
         return $result[0];
     }
