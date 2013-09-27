@@ -1,0 +1,39 @@
+<div class="hero-unit"> 
+    <div class="row">
+        <div class="col-lg-3">
+            <h3>Profile Image</h3>
+            <hr />
+            <img src="<?php echo $profile_pic ?>" />
+        </div>
+        <div class="col-lg-3">
+            <h3>Basic Info</h3>
+            <hr />
+            <p>First Name: <?php echo $first_name ?> </p>
+            <p>Last Name: <?php echo $last_name ?> </p>
+            <p>Class: <?php echo $class_date ?> </p>
+        </div>
+        <div class="col-lg-6">
+            <h3>Summary</h3>
+            <hr />
+            <p><?php echo $summary ?></p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12">
+            <h3>Story</h3>
+            <hr />
+            <p><?php echo $story ?></p>
+        </div>
+    </div>
+    <br />
+    <div class="row">
+        <div class="col-lg-12">
+            <form method="post">
+                <input type="hidden" class="college-id" name="college_id" value="0" />
+                <input type="hidden" name="command" value="approve" />
+                <?php echo $approve ?>
+            </form>
+        </div>
+    </div>
+</div>
+</form>

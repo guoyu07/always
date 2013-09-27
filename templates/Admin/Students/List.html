@@ -1,0 +1,55 @@
+<?php echo $menu ?>
+<div class="pager-listing" id="student-list" data-rpp="10">
+    <div class="row">
+        <div class="span3 pull-right pager-search"></div>
+        <div class="span2"><button class="btn btn-primary" id="new-student">Create student</button></div>
+    </div>
+    <table class="table table-striped">
+        <thead class="pager-head">
+            <tr>
+                <th class="pager-header first_name"></th>
+                <th class="pager-header last_name"></th>
+                <th class="pager-header class_date"></th>
+            </tr>
+        </thead>
+        <tbody class="pager-body">
+            <tr class="pager-row pointer" data-row-id="">
+                <td class="pager-column first_name"></td>
+                <td class="pager-column last_name"></td>
+                <td class="pager-column class_date"></td>
+            </tr>
+        </tbody>
+    </table>
+    <div id="page-list" style="text-align:center"></div>
+</div>
+<div id="student-options" style="display:none">
+    <form method="post" action="always/admin/students" class="form-inline">
+        <input type="hidden" class="student-id" name="student_id" value="0" />
+        <input type="hidden" name="command" value="save" />
+        <input type="text" name="student" id="student-name" />
+        <input type="submit" id="save-button" class="btn" value="Save" />
+    </form>
+    <div id="other-options" style="display:none">
+        <hr />
+        <p>Add counselors to this student</p>
+        <form method="post" action="always/admin/students" style="text-align : center">
+            <input type="hidden" class="student-id" name="student_id" value="0" />
+            <input type="hidden" name="command" value="update-counselors" />
+            <div id="counselors-list">
+                <select id="counselor-select" name="counselors[]" multiple style="width : 100%">
+                </select>
+            </div>
+            <input type="submit" class="btn" value="Save counselors" style="margin-top : 4px" />
+        </form>
+        <hr />
+        <form method="post" action="always/admin/students" class="form-inline" style="text-align : center">
+            <input type="hidden" class="student-id" name="student_id" value="0" />
+            <input type="hidden" name="command" value="delete" />
+            <input type="submit" id="delete-button" class="btn-danger btn" disabled value="Permanently delete this student" />
+            <br />
+            <input type="checkbox" id="delete-approval" name="delete_approval" value="1" />
+            <label for="delete-approval">Confirm deletion</label>
+        </form>
+    </div>
+
+</div>

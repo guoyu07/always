@@ -1,0 +1,37 @@
+<?=$menu?>
+<p><button class="btn btn-primary" id="assign-counselor">Assign counselor</button></p>
+<div class="pager-listing" id="counselor-list" data-rpp="10">
+    <div style="text-align:right" class="pager-search"></div>
+    <table class="table table-striped">
+        <thead class="pager-head">
+            <tr>
+                <th class="pager-header display_name"></th>
+                <th class="pager-header username"></th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody class="pager-body">
+            <tr class="pager-row" data-row-id="">
+                <td class="pager-column display_name"></td>
+                <td class="pager-column username"></td>
+                <td class="pager-column action"></td>
+            </tr>
+        </tbody>
+    </table>
+    <div id="page-list" style="text-align:center"></div>
+</div>
+<div id="assign-form" style="display:none">
+    <?php if (isset($users)): ?>
+    <form method="post" action="resumedrop/admin/counselors">
+        <input type="hidden" name="command" value="save_counselor" />
+        <select name="user_id" id="user-id"><?php foreach($users as $user_id=>$username):?>
+            <option value='<?=$user_id?>'><?=$username?></option>
+            <?php endforeach; ?></select>
+        <input type="submit" value="Make user a counselor" />
+    </form>
+    <?php endif; ?>
+    <?php if (!isset($users)): ?>
+    <p>All users have been assigned.</p>
+    <?php endif; ?>
+</div>
+<table id="error"></table>

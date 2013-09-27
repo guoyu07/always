@@ -1,0 +1,50 @@
+<?=$menu?>
+<p><button class="btn btn-primary" id="new-page">Add a Page</button></p>
+<div class="pager-listing" id="page-list" data-rpp="10">
+    <div class="pull-right pager-search"></div>
+    <table class="table table-striped">
+        <thead class="pager-head">
+            <tr>
+                <th class="pager-header name"></th>
+                <th class="pager-header assigned"></th>
+            </tr>
+        </thead>
+        <tbody class="pager-body">
+            <tr class="pager-row pointer" data-row-id="">
+                <td class="pager-column name"></td>
+                <td class="pager-column assigned"></td>
+            </tr>
+        </tbody>
+    </table>
+    <div id="page-list" style="text-align:center"></div>
+</div>
+<div id="college-options" style="display:none">
+    <form method="post" action="always/admin/pages" class="form-inline">
+        <input type="hidden" class="page-id" name="page_id" value="0" />
+        <input type="hidden" name="command" value="save" />
+        <input type="text" name="college" id="college-name" />
+        <input type="submit" id="save-button" class="btn" value="Save" />
+    </form>
+    <div id="other-options" style="display:none">
+        <hr />
+        <p>Add parents to this page.</p>
+        <form method="post" action="always/admin/pages" style="text-align : center">
+            <input type="hidden" class="page-id" name="page_id" value="0" />
+            <input type="hidden" name="command" value="update-pages" />
+            <div id="page-list">
+                <select id="page-select" name="pages[]" multiple style="width : 100%">
+                </select>
+            </div>
+            <input type="submit" class="btn" value="Save pages" style="margin-top : 4px" />
+        </form>
+        <hr />
+        <form method="post" action="always/admin/pages" class="form-inline" style="text-align : center">
+            <input type="hidden" class="page-id" name="page_id" value="0" />
+            <input type="hidden" name="command" value="delete" />
+            <input type="submit" id="delete-button" class="btn-danger btn" disabled value="Permanently delete this page" />
+            <br />
+            <input type="checkbox" id="delete-approval" name="delete_approval" value="1" />
+            <label for="delete-approval">Confirm deletion</label>
+        </form>
+    </div>
+</div>
