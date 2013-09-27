@@ -16,6 +16,14 @@ class Student extends \Resource {
     protected $id;
 
     /**
+     * Id of user account tied to student
+     * @var integer
+     */
+    protected $user_id;
+
+    private $username;
+
+    /**
      * @var Variable\String
      */
     protected $first_name;
@@ -35,15 +43,15 @@ class Student extends \Resource {
      * @var Variable\String
      */
     protected $bg;
-    
+
     /**
      * The Profile Picture uploaded
      * @var Variable\String
      */
     protected $profile_pic;
-    
+
     /**
-     * The Story 
+     * The Story
      * @var Variable\String
      */
     protected $story;
@@ -59,7 +67,7 @@ class Student extends \Resource {
      * @var Variable\Integer
      */
     protected $submitted;
-    
+
     /**
      * The 'Live' Story
      * @var Variable\String
@@ -77,7 +85,7 @@ class Student extends \Resource {
      * @var Variable\String
      */
     protected $live_profile_pic;
-    
+
     /**
      * The Database table
      * @var Variable\String
@@ -92,11 +100,15 @@ class Student extends \Resource {
         $this->last_name = new \Variable\String(null, 'last_name');
         $this->last_name->allowEmpty(false);
         $this->class_date = new \Variable\Integer(null, 'class_date');
+        $this->class_date->setRange(1950, date('Y') + 1);
+        $this->class_date->setInputType('select');
+
         $this->bg = new \Variable\String(null, 'bg');
         $this->profile_pic = new \Variable\String(null, 'profile_pic');
         $this->story = new \Variable\String(null, 'story');
         $this->summary = new \Variable\String(null, 'summary');
         $this->submitted = new \Variable\Integer(0, 'submitted');
+        $this->username = new \Variable\Email(null, 'username');
     }
 
     public function __set($name, $value)

@@ -11,27 +11,24 @@ class Admin extends \Http\Controller {
 
     public function getController(\Request $request)
     {
-        $nrequest = $request->getNextRequest();
-        $token = $nrequest->getCurrentToken();
+        $cmd = $request->shiftCommand();
 
-        if ($token == '/') {
-            $token = 'students';
+        if (empty($cmd)) {
+            $cmd = 'students';
         }
+
         $controllers = array(
             'students'      => '\always\Controller\Admin\Students',
         );
 
-        if (!array_key_exists($token, $controllers)) {
+        if (!array_key_exists($cmd, $controllers)) {
             throw new \Http\NotFoundException($request);
         }
 
-        $class = $controllers[$token];
+        $class = $controllers[$cmd];
         $controller = new $class($this->getModule());
         return $controller;
     }
-
-    public function getHtmlView($data, \Request $request){}
-
 }
 
 ?>

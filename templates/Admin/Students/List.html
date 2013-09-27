@@ -22,11 +22,12 @@
     </table>
     <div id="page-list" style="text-align:center"></div>
 </div>
-<div id="student-options" style="display:none">
-    <form method="post" action="always/admin/students" class="form-inline">
-        <input type="hidden" class="student-id" name="student_id" value="0" />
-        <input type="hidden" name="command" value="save" />
-        <input type="text" name="student" id="student-name" />
-        <input type="submit" id="save-button" class="btn" value="Save" />
-    </form>
+<div id="student-options">
+    <?=$form_start?>
+    <?=$username_group?>
+    <?=$first_name_group?>
+    <?=$last_name_group?>
+    <?=$class_date_group?>
+    <?=$submit?>
+    <?=$form_end?>
 </div>

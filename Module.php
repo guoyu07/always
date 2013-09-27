@@ -8,6 +8,7 @@ namespace always;
  * @license http://opensource.org/licenses/lgpl-3.0.html
  */
 class Module extends \Module {
+
     public function __construct()
     {
         parent::__construct();
@@ -17,23 +18,19 @@ class Module extends \Module {
 
     public function getController(\Request $request)
     {
-        $token = $request->getCurrentToken();
-        if (!\Current_User::isLogged() || $token == '/' || $token == 'user' || $token == 'upload') 
-        {
+        $cmd = $request->shiftCommand();
+        if (!\Current_User::isLogged() || $cmd == 'user') {
             // not logged, let User controller handle log in
             $controller = new \always\Controller\User($this);
-        } 
-        elseif ($token == 'admin' && \Current_User::allow('always')) 
-        {
+        } elseif ($cmd == 'admin' && \Current_User::allow('always')) {
             $admin = new \always\Controller\Admin($this);
             $controller = $admin->getController($request);
-        } 
-        else 
-        {
+        } else {
             throw new \Http\NotFoundException($request);
         }
         return $controller;
     }
+
 }
 
 ?>

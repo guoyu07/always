@@ -31,17 +31,28 @@ class Students extends \Http\Controller {
     public function post(\Request $request)
     {
         $student = new \always\Student;
-        $student->id = $request->getVar('student_id');
+        $student_id = $request->getVar('student_id');
+        if ($student_id) {
+            $student->id = $student_id;
+            \ResourceFactory::loadByID($student);
+        }
+
+
         switch ($request->getVar('command')) {
             case 'save':
+                $this->createNewUser($request->getVar('username'));
+
                 $student->first_name = $request->getVar('first_name');
                 $student->last_name = $request->getVar('last_name');
                 $student->class_date = $request->getVar('class_date');
+                /*
                 $student->bg = $request->getVar('bg');
                 $student->profile_pic = $request->getVar('profile_pic');
                 $student->story = $request->getVar('story');
                 $student->summary = $request->getVar('summary');
                 $student->submitted = 1;
+                 *
+                 */
                 \ResourceFactory::saveResource($student);
                 break;
 
@@ -62,36 +73,70 @@ class Students extends \Http\Controller {
         return $response;
     }
 
+    private function createNewUser($username)
+    {
+        echo "createNewUser needs to create a new local user using $username";
+    }
+
     public function getHtmlView($data, \Request $request)
     {
         // JQuery called in prepare
         \Pager::prepare();
+        javascript('jquery');
         javascript('jquery_ui');
         \Layout::addJSHeader("<script type='text/javascript' src='" .
                 PHPWS_SOURCE_HTTP . "mod/always/javascript/Student/script.js'></script>");
         \Layout::addStyle('always', 'style.css');
-        $data['menu'] = $this->menu->get($request);
 
         $cmd = $request->shiftCommand();
 
-        $template = new \Template();
+        if (empty($cmd)) {
+            $cmd = 'list';
+        }
 
         switch ($cmd) {
-            case 'admin':
-                $template->setModuleTemplate('always',
-                        'Admin/Students/List.html');
+            case 'list':
+                return $this->studentList($request);
                 break;
 
             default:
+                $template = new \Template();
                 $template->setModuleTemplate('always',
                         'Admin/Students/Student.html');
                 $data = array_merge((array) $data,
                         (array) $this->getStudent($cmd));
+                $template->addVariables($data);
+                return $template;
                 break;
         }
-        $template->addVariables($data);
-        //var_dump($template);
-        //break;
+    }
+
+    private function studentList($request)
+    {
+        $student = new \always\Student;
+        $form = $student->pullForm();
+        $form->appendCSS('bootstrap');
+        $form->setAction('/always/admin/students');
+        $form->addHidden('command', 'save');
+        $form->addHidden('student_id', 0);
+
+        if (!$student->getId()) {
+            $username = $form->addEmail('username');
+            $username->setPlaceholder("Enter parent's email address");
+        }
+
+        $form->getSingleInput('first_name')->setRequired();
+        $form->getSingleInput('last_name')->setRequired();
+        $form->getSingleInput('class_date')->setFirstBlank();
+
+        $form->addSubmit('submit', 'Save student');
+        $data = $form->getInputStringArray();
+        $data['menu'] = $this->menu->get($request);
+
+        //var_dump($data);
+
+        $template = new \Template($data);
+        $template->setModuleTemplate('always', 'Admin/Students/List.html');
         return $template;
     }
 
@@ -110,10 +155,6 @@ class Students extends \Http\Controller {
             $first_name = $student->addField('first_name');
             $last_name = $student->addField('last_name');
             $class_date = $student->addField('class_date');
-            //$ct = $db->addTable('rd_ctocollege');
-            //$col_id = $ct->addField('college_id', 'assigned');
-            //$col_id->showCount();
-            //$db->join($college->getField('id'), $col_id, 'left');
             $db->setGroupBy($last_name);
             $pager = new \DatabasePager($db);
             $pager->setHeaders(array('last_name', 'first_name', 'class_date'));
