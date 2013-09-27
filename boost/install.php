@@ -8,14 +8,13 @@
  */
 function always_install(&$content)
 {
-    return true;
-    
     Database::phpwsDSNLoader(PHPWS_DSN);
     $db = Database::newDB();
     $db->begin();
 
     try {
-
+        $student = new always\Student;
+        $student->createTable($db);
     } catch (\Exception $e) {
         $db->rollback();
         throw $e;

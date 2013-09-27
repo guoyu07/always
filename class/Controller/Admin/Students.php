@@ -63,19 +63,16 @@ class Students extends \Http\Controller {
     }
 
     public function getHtmlView($data, \Request $request)
-    {   
+    {
         // JQuery called in prepare
         \Pager::prepare();
         javascript('jquery_ui');
-        \Layout::addToStyleList('mod/always/javascript/select2/select2.css');
-        \Layout::addJSHeader("<script type='text/javascript' src='" .
-                PHPWS_SOURCE_HTTP . "mod/always/javascript/select2/select2.js'></script>");
         \Layout::addJSHeader("<script type='text/javascript' src='" .
                 PHPWS_SOURCE_HTTP . "mod/always/javascript/Student/script.js'></script>");
         \Layout::addStyle('always', 'style.css');
         $data['menu'] = $this->menu->get($request);
         $template = new \Template();
-        
+
         $nrequest = $request->getNextRequest();
         $nnrequest = $nrequest->getNextRequest();
         $token = $nnrequest->getCurrentToken();
@@ -126,7 +123,7 @@ class Students extends \Http\Controller {
     }
 
     private function getStudent($student_name)
-    {   
+    {
         $name = explode('-', $student_name);
         $db = \Database::newDB();
         $co = $db->addTable('always_student');

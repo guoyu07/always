@@ -84,15 +84,5 @@ function student() {
         $('#student-options').dialog('open');
     };
 
-    this.initSelect = function() {
-        $('#counselor-select').select2({
-            placeholder: 'Click to pick counselors',
-            width: 'copy'
-        });
-    };
-
-    this.delete = function() {
-
-    };
 }
 ;
