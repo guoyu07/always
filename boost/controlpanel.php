@@ -6,9 +6,9 @@
  */
 $link[] = array('label' => 'Always',
     'restricted' => TRUE,
-    'url' => 'always/admin/counselors',
-    'description' => 'Lets students post resumes for counselors to review.',
-    'image' => 'dropbox.png',
+    'url' => 'always/admin/',
+    'description' => 'Information about former students',
+    'image' => 'candle.jpg',
     'tab' => 'content'
 );
 ?>

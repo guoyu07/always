@@ -9,8 +9,6 @@
 
 function always_uninstall(&$content)
 {
-    $db = Database::newDB();
-    $db->buildTable('always_student')->drop();
     return true;
 }
 

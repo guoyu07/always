@@ -8,14 +8,13 @@
  */
 function always_install(&$content)
 {
-    //require_once PHPWS_SOURCE_DIR . 'mod/always/class/Student';
+    return true;
+    
     Database::phpwsDSNLoader(PHPWS_DSN);
     $db = Database::newDB();
     $db->begin();
 
     try {
-        $college = new always\Student;
-        $college->createTable($db);
 
     } catch (\Exception $e) {
         $db->rollback();
