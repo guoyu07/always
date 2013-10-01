@@ -23,11 +23,19 @@
     <div id="page-list" style="text-align:center"></div>
 </div>
 <div id="student-options">
-    <?=$form_start?>
-    <?=$username_group?>
-    <?=$first_name_group?>
-    <?=$last_name_group?>
-    <?=$class_date_group?>
-    <?=$submit?>
-    <?=$form_end?>
+    <?php echo $form_start ?>
+    <?php echo $username_group ?>
+    <fieldset>
+        <legend>Parent information</legend>
+    <?php echo $first_name_group ?>
+    <?php echo $last_name_group ?>
+    </fieldset>
+    <fieldset>
+        <legend>Student information</legend>
+    <?php echo $student_fname_group ?>
+    <?php echo $student_lname_group ?>
+    </fieldset>
+    <?php echo $class_date_group ?>
+    <?php echo $submit?>
+    <?php echo $form_end?>
 </div>

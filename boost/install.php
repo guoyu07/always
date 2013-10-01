@@ -14,8 +14,17 @@ function always_install(&$content)
 
     try {
         $student = new always\Student;
-        $student->createTable($db);
+        $st = $student->createTable($db);
+
+        $profile = new always\Profile;
+        $pt = $profile->createTable($db);
     } catch (\Exception $e) {
+        if (isset($st) && $db->tableExists($st->getName())) {
+            $st->drop();
+        }
+        if (isset($pt) && $db->tableExists($pt->getName())) {
+            $pt->drop();
+        }
         $db->rollback();
         throw $e;
     }

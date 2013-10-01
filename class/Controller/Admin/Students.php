@@ -12,6 +12,7 @@ class Students extends \Http\Controller {
 
     private $menu;
 
+
     public function __construct(\Module $module)
     {
         parent::__construct($module);
@@ -40,19 +41,13 @@ class Students extends \Http\Controller {
 
         switch ($request->getVar('command')) {
             case 'save':
-                $this->createNewUser($request->getVar('username'));
-
                 $student->first_name = $request->getVar('first_name');
                 $student->last_name = $request->getVar('last_name');
+                $student->student_fname = $request->getVar('student_fname');
+                $student->student_lname = $request->getVar('student_lname');
                 $student->class_date = $request->getVar('class_date');
-                /*
-                $student->bg = $request->getVar('bg');
-                $student->profile_pic = $request->getVar('profile_pic');
-                $student->story = $request->getVar('story');
-                $student->summary = $request->getVar('summary');
-                $student->submitted = 1;
-                 *
-                 */
+
+                $this->createNewUser($request->getVar('username'), $student);
                 \ResourceFactory::saveResource($student);
                 break;
 
@@ -61,11 +56,8 @@ class Students extends \Http\Controller {
                 break;
 
             case 'approve';
+                exit('approve not written');
                 $student = $this->getStudent($student->id);
-                $student->submitted = 0;
-                $student->live_profile_pic = $student->profile_pic;
-                $student->live_summary = $student->summary;
-                $student->live_story = $student->story;
                 \ResourceFactory::saveResource($student);
                 break;
         }
@@ -73,9 +65,45 @@ class Students extends \Http\Controller {
         return $response;
     }
 
-    private function createNewUser($username)
+    private function createNewUser($username, $student)
     {
-        echo "createNewUser needs to create a new local user using $username";
+        $username = strtolower($username);
+        $user = new \PHPWS_User;
+
+        if ($user->isDuplicateUsername($username)) {
+            throw new \Exception('User already in system');
+        }
+
+        $user->username = $user->email = $username;
+
+        if ($user->isDuplicateEmail()) {
+            throw new \Exception('Email address already in system');
+        }
+
+        $user->created = time();
+        $user->updated = time();
+        $user->setActive(1);
+        $user->setApproved(1);
+        $user->authorize = 1;
+        $user->save();
+
+        $password = randomString();
+        $password_hash = md5($user->username . $password);
+
+        $user->password = $password;
+
+        $auth = new local_authorization($user);
+        $auth->createUser();
+
+        PHPWS_Core::initModClass('users', 'Action.php');
+        User_Action::assignDefaultGroup($user);
+
+        $db = \Database::newDB();
+        $pw = $db->addTable('always_pw');
+        $pw->addValue('username', $user->username);
+        $pw->addValue('u', $user->username);
+
+
     }
 
     public function getHtmlView($data, \Request $request)
@@ -127,6 +155,8 @@ class Students extends \Http\Controller {
 
         $form->getSingleInput('first_name')->setRequired();
         $form->getSingleInput('last_name')->setRequired();
+        $form->getSingleInput('student_fname')->setRequired()->setLabel('First name');
+        $form->getSingleInput('student_lname')->setRequired()->setLabel('Last name');
         $form->getSingleInput('class_date')->setFirstBlank();
 
         $form->addSubmit('submit', 'Save student');

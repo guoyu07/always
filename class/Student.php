@@ -21,6 +21,10 @@ class Student extends \Resource {
      */
     protected $user_id;
 
+    /**
+     * Username of users table. Also the email address.
+     * @var string
+     */
     private $username;
 
     /**
@@ -36,61 +40,24 @@ class Student extends \Resource {
     /**
      * @var Variable\String
      */
+    protected $student_fname;
+
+    /**
+     * @var Variable\String
+     */
+    protected $student_lname;
+
+    /**
+     * @var Variable\String
+     */
     protected $class_date;
-
-    /**
-     * Reference to Selected BG
-     * @var Variable\String
-     */
-    protected $bg;
-
-    /**
-     * The Profile Picture uploaded
-     * @var Variable\String
-     */
-    protected $profile_pic;
-
-    /**
-     * The Story
-     * @var Variable\String
-     */
-    protected $story;
-
-    /**
-     * The Summary
-     * @var Variable\String
-     */
-    protected $summary;
-
-    /**
-     * Has the story been submitted for approval?
-     * @var Variable\Integer
-     */
-    protected $submitted;
-
-    /**
-     * The 'Live' Story
-     * @var Variable\String
-     */
-    protected $live_story;
-
-    /**
-     * The 'Live' Summary
-     * @var Variable\String
-     */
-    protected $live_summary;
-
-    /**
-     * The 'Live' Profile Pic
-     * @var Variable\String
-     */
-    protected $live_profile_pic;
 
     /**
      * The Database table
      * @var Variable\String
      */
     protected $table = 'always_student';
+
     public function __construct()
     {
         parent::__construct();
@@ -99,15 +66,13 @@ class Student extends \Resource {
         $this->first_name->allowEmpty(false);
         $this->last_name = new \Variable\String(null, 'last_name');
         $this->last_name->allowEmpty(false);
+        $this->student_fname = new \Variable\String(null, 'student_fname');
+        $this->student_fname->allowEmpty(false);
+        $this->student_lname = new \Variable\String(null, 'student_lname');
+        $this->student_lname->allowEmpty(false);
         $this->class_date = new \Variable\Integer(null, 'class_date');
         $this->class_date->setRange(1950, date('Y') + 1);
         $this->class_date->setInputType('select');
-
-        $this->bg = new \Variable\String(null, 'bg');
-        $this->profile_pic = new \Variable\String(null, 'profile_pic');
-        $this->story = new \Variable\String(null, 'story');
-        $this->summary = new \Variable\String(null, 'summary');
-        $this->submitted = new \Variable\Integer(0, 'submitted');
         $this->username = new \Variable\Email(null, 'username');
     }
 
