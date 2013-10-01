@@ -62,6 +62,7 @@ class Student extends \Resource {
     {
         parent::__construct();
         $this->id = new \Variable\Integer(null, 'id');
+        $this->user_id = new \Variable\Integer(null, 'user_id');
         $this->first_name = new \Variable\String(null, 'first_name');
         $this->first_name->allowEmpty(false);
         $this->last_name = new \Variable\String(null, 'last_name');

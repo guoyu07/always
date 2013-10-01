@@ -47,7 +47,8 @@ class Students extends \Http\Controller {
                 $student->student_lname = $request->getVar('student_lname');
                 $student->class_date = $request->getVar('class_date');
 
-                $this->createNewUser($request->getVar('username'), $student);
+                $new_user_id = $this->createNewUser($request->getVar('username'), $student);
+                $student->user_id = $new_user_id;
                 \ResourceFactory::saveResource($student);
                 break;
 
@@ -80,30 +81,20 @@ class Students extends \Http\Controller {
             throw new \Exception('Email address already in system');
         }
 
-        $user->created = time();
-        $user->updated = time();
         $user->setActive(1);
         $user->setApproved(1);
-        $user->authorize = 1;
         $user->save();
 
         $password = randomString();
         $password_hash = md5($user->username . $password);
 
-        $user->password = $password;
-
-        $auth = new local_authorization($user);
-        $auth->createUser();
-
-        PHPWS_Core::initModClass('users', 'Action.php');
-        User_Action::assignDefaultGroup($user);
-
         $db = \Database::newDB();
-        $pw = $db->addTable('always_pw');
-        $pw->addValue('username', $user->username);
-        $pw->addValue('u', $user->username);
+        $t = $db->addTable('user_authorization');
+        $t->addValue('username', $username);
+        $t->addValue('password', $password_hash);
+        $t->insert();
 
-
+        return $user->id;
     }
 
     public function getHtmlView($data, \Request $request)
