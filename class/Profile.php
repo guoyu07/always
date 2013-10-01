@@ -64,10 +64,12 @@ class Profile extends \Resource {
     public function __construct()
     {
         $this->student_id = new \Variable\Integer(null, 'student_id');
-        $this->bg = new \Variable\String(null, 'bg');
+        $this->bg = new \Variable\Integer(null, 'bg');
         $this->profile_pic = new \Variable\String(null, 'profile_pic');
         $this->story = new \Variable\String(null, 'story');
         $this->summary = new \Variable\String(null, 'summary');
+        $this->story->setColumnType('Text');
+        $this->summary->setColumnType('Text');
         $this->submitted = new \Variable\Bool(0, 'submitted');
         $this->version = new \Variable\Integer(0, 'version');
         $this->approved = new \Variable\Bool(0, 'approved');
