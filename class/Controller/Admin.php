@@ -18,7 +18,7 @@ class Admin extends \Http\Controller {
         }
 
         $controllers = array(
-            'students'      => '\always\Controller\Admin\Students',
+            'students' => '\always\Controller\Admin\Students',
         );
 
         if (!array_key_exists($cmd, $controllers)) {
@@ -29,6 +29,7 @@ class Admin extends \Http\Controller {
         $controller = new $class($this->getModule());
         return $controller;
     }
+
 }
 
 ?>

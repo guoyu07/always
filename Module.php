@@ -19,14 +19,11 @@ class Module extends \Module {
     public function getController(\Request $request)
     {
         $cmd = $request->shiftCommand();
-        if (!\Current_User::isLogged() || $cmd == 'user') {
-            // not logged, let User controller handle log in
-            $controller = new \always\Controller\User($this);
-        } elseif ($cmd == 'admin' && \Current_User::allow('always')) {
+        if ($cmd == 'admin' && \Current_User::allow('always')) {
             $admin = new \always\Controller\Admin($this);
             $controller = $admin->getController($request);
         } else {
-            throw new \Http\NotFoundException($request);
+            $controller = new \always\Controller\User($this);
         }
         return $controller;
     }
