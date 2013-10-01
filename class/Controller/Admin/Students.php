@@ -86,6 +86,10 @@ class Students extends \Http\Controller {
         $user->save();
 
         $password = randomString();
+
+        // This is for testing. REMOVE BEFORE PUBLISHING.
+        $password = 'password';
+
         $password_hash = md5($user->username . $password);
 
         $db = \Database::newDB();
