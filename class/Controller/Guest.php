@@ -8,7 +8,8 @@ namespace always\Controller;
  * @license http://opensource.org/licenses/lgpl-3.0.html
  */
 class Guest extends \Http\Controller {
-public function get(\Request $request)
+
+    public function get(\Request $request)
     {
         $data = array();
         $view = $this->getView($data, $request);
