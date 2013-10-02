@@ -10,11 +10,11 @@ namespace always;
 class Profile extends \Resource {
 
     /**
-     * Id of Student this profile is attached to.
+     * Id of Parent this profile is attached to.
      *
      * @var integer
      */
-    protected $student_id;
+    protected $parent_id;
     /**
      * Reference to Selected BG
      * @var Variable\String
@@ -63,7 +63,7 @@ class Profile extends \Resource {
 
     public function __construct()
     {
-        $this->student_id = new \Variable\Integer(null, 'student_id');
+        $this->parent_id = new \Variable\Integer(null, 'parent_id');
         $this->bg = new \Variable\Integer(null, 'bg');
         $this->profile_pic = new \Variable\String(null, 'profile_pic');
         $this->story = new \Variable\String(null, 'story');

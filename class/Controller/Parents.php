@@ -36,8 +36,8 @@ class Parents extends \Http\Controller {
     {
         $profile = new \always\Parents;
         $db = \Database\newDB();
-        $as = $db->addTable('always_student');
-        $as->addFieldConditional('user_id', \Current_User::getId());
+        $ap = $db->addTable('always_parents');
+        $ap->addFieldConditional('user_id', \Current_User::getId());
     }
 
 }

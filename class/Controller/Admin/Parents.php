@@ -156,7 +156,6 @@ class Parents extends \Http\Controller {
 
         $form->addSubmit('submit', 'Save parent');
         $data = $form->getInputStringArray();
-        $data['menu'] = $this->menu->get($request);
 
         //var_dump($data);
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace always\Controller\User;
+namespace always\Controller\Parents;
 
 /**
  *
@@ -9,23 +9,23 @@ namespace always\Controller\User;
  */
 class Profile extends \Http\Controller {
 
-    private $student;
+    private $parents;
     private $profile;
 
     public function __construct()
     {
-        $this->loadStudent();
+        $this->loadParent();
     }
 
-    public function loadStudent()
+    public function loadParent()
     {
-        $this->student = new \always\Parent;
+        $this->parents = new \always\Parents;
 
         $user_id = \Current_User::getId();
         $db = \Database::newDB();
-        $student = $db->addTable('always_student');
-        $db->setConditional($student->getFieldConditional('user_id', $user_id));
-        $db->selectInto($this->student);
+        $parents = $db->addTable('always_parents');
+        $db->setConditional($parents->getFieldConditional('user_id', $user_id));
+        $db->selectInto($this->parents);
     }
 
     public function get(\Request $request)
@@ -70,7 +70,7 @@ class Profile extends \Http\Controller {
         $db = \Database::newDB();
         $pt = $db->addTable('always_profile');
         $pt->addOrderBy($pt->getField('version'), 'desc');
-        $db->addConditional($pt->getFieldConditional('student_id', $this->student->id));
+        $db->addConditional($pt->getFieldConditional('parent_id', $this->parents->id));
         $db->addConditional($pt->getFieldConditional('approved', 1));
         $db->setLimit(1);
         $db->selectInto($profile);
