@@ -175,7 +175,7 @@ class Parents extends \Http\Controller {
             }
         } else {
             $db = \Database::newDB();
-            $parent = $db->addTable('always_parent');
+            $parent = $db->addTable('always_parents');
             $id = $parent->addField('id');
             $first_name = $parent->addField('first_name');
             $last_name = $parent->addField('last_name');
@@ -198,7 +198,7 @@ class Parents extends \Http\Controller {
     {
         $name = explode('-', $parent_name);
         $db = \Database::newDB();
-        $co = $db->addTable('always_parent');
+        $co = $db->addTable('always_parents');
         $db->setConditional($co->getFieldconditional('first_name', $name[0]));
         $db->setConditional($co->getFieldconditional('last_name', $name[1]));
         $result = $db->select();
