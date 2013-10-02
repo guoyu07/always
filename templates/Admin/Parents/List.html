@@ -1,9 +1,12 @@
 <div class="pager-listing bg-tl" id="parent-list" data-rpp="10">
     <div class="row">
-        <div class="span3 pull-right pager-search"></div>
-        <div class="span2"><button class="btn btn-primary" id="new-parent">Create parent</button></div>
+        <div class="col-lg-3">
+            <button class="btn btn-primary" style="margin:10px;" id="new-parent">Create parent</button>
+        </div>
+        <div class="col-lg-4 col-lg-push-5 pager-search" style=""></div>
     </div>
     <div class="row">
+      <div class="col-lg-12">
         <table class="table table-striped">
             <thead class="pager-head">
                 <tr>
@@ -18,9 +21,11 @@
                 </tr>
             </tbody>
         </table>
+      </div>
     </div>
     <div id="page-list" style="text-align:center"></div>
 </div>
+
 <div id="parent-options">
     <?php echo $form_start ?>
     <?php echo $username_group ?>

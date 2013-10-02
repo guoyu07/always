@@ -1,20 +1,25 @@
-<div class="bg-tl">
-    <p>The Student Memorial Program remembers and honors Appalachian students who have passed away
-        while enrolled as a student.
-        Each student is memorialized on a plaque in the B.B. Dougherty Administration Building.
-        Appalachian annually invites each of these students' families to campus in the Fall
-        for a special Student Memorial Program. This program honors and remembers each of these
-        Mountaineers by reading their names and words of remembrance from the family.</p>
+<div class="row">
+    <div class="col-lg-10 col-lg-push-1">
+        <div class="border-box top-box"></div>
+        <div class="bg-tl">
+            <p class="lead">The Student Memorial Program remembers and honors previously enrolled Appalachian students who have passed away.
+                The plaque in the B.B. Dougherty Administration Building memorializes these students.
+                Each Fall, Appalachian invites these students' families to campus for a special Student Memorial Program. During this program we honor and remember these
+                Mountaineers by reading their names and families' words of remembrance.</p>
 
-    <p class="lead" style="text-align:center;">These students will "Always be a Mountaineer."</p>
+            <p class="lead" style="text-align:center;">These students will &ldquo;Always be a Mountaineer.&rdquo;</p>
 
-    <form>
-        <input type="text" name="always_search" placeholder="Search for student" id="always-search" /> <button class="btn btn-default">Find</button>
-    </form>
+
+            <form>
+                <input type="text" name="always_search" placeholder="Search for student" id="always-search" /> <button class="btn btn-default">Find</button>
+            </form>
+
+            <?php if ($parent): ?>
+            <div class="text-center">
+                <a href="always/parent/"><button class="btn btn-default"><?=$button?></button></a>
+            </div>
+            <?php endif; ?>
+        </div>
+        <div class="border-box bottom-box"></div>
+    </div>
 </div>
-<?php if ($parent): ?>
-<div class="text-center">
-    <a href="always/parent/"><button class="btn btn-default"><?=$button?></button></a>
-</div>
-<?php endif; ?>
-
