@@ -10,8 +10,8 @@ function always_uninstall(&$content)
 {
     $db = Database::newDB();
 
-    if ($db->tableExists('always_student')) {
-        $tbl = $db->buildTable('always_student');
+    if ($db->tableExists('always_parents')) {
+        $tbl = $db->buildTable('always_parents');
         $tbl->drop();
    }
     if ($db->tableExists('always_profile')) {

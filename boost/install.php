@@ -13,8 +13,8 @@ function always_install(&$content)
     $db->begin();
 
     try {
-        $student = new always\Parent;
-        $st = $student->createTable($db);
+        $parent = new always\Parents;
+        $st = $parent->createTable($db);
 
         $profile = new always\Profile;
         $pt = $profile->createTable($db);

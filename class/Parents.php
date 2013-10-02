@@ -7,16 +7,16 @@ namespace always;
  * @author Matthew McNaney <mcnaney at gmail dot com>
  * @license http://opensource.org/licenses/lgpl-3.0.html
  */
-class Parent extends \Resource {
+class Parents extends \Resource {
 
     /**
-     * Id for each Student
+     * Id for each Parent
      * @var Variable\Integer
      */
     protected $id;
 
     /**
-     * Id of user account tied to student
+     * Id of user account tied to Parent
      * @var integer
      */
     protected $user_id;
@@ -56,7 +56,7 @@ class Parent extends \Resource {
      * The Database table
      * @var Variable\String
      */
-    protected $table = 'always_student';
+    protected $table = 'always_parents';
 
     public function __construct()
     {
