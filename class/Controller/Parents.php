@@ -19,6 +19,53 @@ class Parents extends \Http\Controller {
         return $response;
     }
 
+    public function post(\Request $request)
+    {
+        $this->loadCurrentParent();
+        $id = $request->getVar('id');
+        if ($id) {
+            $profile = \always\ProfileFactory::getProfileById($id);
+        } else {
+            $profile = new \always\Profile;
+        }
+
+        if ($request->isUploadedFile('profile_pic')) {
+            $file = $request->getUploadedFileArray('profile_pic');
+            $image_path = \always\ProfileFactory::saveProfileImage($file,
+                            $this->parent, $profile);
+            $profile->setProfilePic($image_path);
+        }
+
+
+        $profile->setFirstName($request->getVar('first_name'));
+        $profile->setLastName($request->getVar('last_name'));
+        $profile->setClassDate($request->getVar('class_date'));
+        $profile->setSummary($request->getVar('summary'));
+        $profile->setStory($request->getVar('story'));
+        $profile->setParentId($this->parent->getId());
+
+        if ($request->isVar('submit_profile')) {
+            $profile->setSubmitted(true);
+
+            ///// This is a cheat for until we get approval worked out
+            /* @todo Build approval and remove this line */
+            $profile->setApproved(true);
+        } else {
+            $profile->setSubmitted(false);
+        }
+
+        \always\ProfileFactory::saveProfile($profile);
+
+        $link = $profile->getViewUrl();
+        $response = new \Http\SeeOtherResponse($link);
+        return $response;
+    }
+
+    private function loadCurrentParent()
+    {
+        $this->parent = \always\ParentFactory::getCurrentParent();
+    }
+
     public function getHtmlView($data, \Request $request)
     {
         $cmd = $request->shiftCommand();
@@ -31,30 +78,24 @@ class Parents extends \Http\Controller {
             case 'view':
                 return $this->view();
                 break;
+
+            case 'edit':
+                return \always\ProfileFactory::editCurrentUserProfile();
+                break;
         }
     }
 
     private function view()
     {
-        $profile = \always\ProfileFactory::getCurrentProfile();
-        $data = array();
-        $template = new \Template();
-        $template->setModuleTemplate('always', 'Parents/View.html');
-        $template->addVariables($data);
-        return $template;
-    }
+        $profile = \always\ProfileFactory::getCurrentUserProfile();
 
-    public static function getCurrentParent()
-    {
-        $parent = new \always\Parents;
-        $db = \Database::newDB();
-        $ap = $db->addTable('always_parents');
-        $ap->addFieldConditional('user_id', \Current_User::getId());
-        $db->selectInto($parent);
-        $this->parent = $parent;
-        return $this->parent;
+        if ($profile->isSaved()) {
+            return \always\ProfileFactory::displayProfile($profile);
+        } else {
+            // no profile was ever created or it hasn't been approved
+            \Server::forward('/always/parent/edit');
+        }
     }
 
 }
-
 ?>

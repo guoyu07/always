@@ -18,6 +18,9 @@ function always_install(&$content)
 
         $profile = new always\Profile;
         $pt = $profile->createTable($db);
+
+        $index = new \Database\Index($pt->getDataType('pname'), 'pname');
+        $index->create();
     } catch (\Exception $e) {
         if (isset($st) && $db->tableExists($st->getName())) {
             $st->drop();

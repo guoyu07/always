@@ -10,4 +10,5 @@ $proper_name = 'Always';
 $version = '1.0.0';
 $import_sql = false;
 $file_dir = true;
+$image_dir = true;
 ?>
