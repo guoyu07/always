@@ -3,12 +3,12 @@
 namespace always\Controller\Admin;
 
 /**
- * The controller for student administration.
+ * The controller for parent administration.
  *
  * @author Matthew McNaney <mcnaney at gmail dot com>
  * @license http://opensource.org/licenses/lgpl-3.0.html
  */
-class Students extends \Http\Controller {
+class Parents extends \Http\Controller {
 
     private $menu;
 
@@ -31,42 +31,42 @@ class Students extends \Http\Controller {
 
     public function post(\Request $request)
     {
-        $student = new \always\Parent;
-        $student_id = $request->getVar('student_id');
-        if ($student_id) {
-            $student->id = $student_id;
-            \ResourceFactory::loadByID($student);
+        $parent = new \always\Parents;
+        $parent_id = $request->getVar('parent_id');
+        if ($parent_id) {
+            $parent->id = $parent_id;
+            \ResourceFactory::loadByID($parent);
         }
 
 
         switch ($request->getVar('command')) {
             case 'save':
-                $student->first_name = $request->getVar('first_name');
-                $student->last_name = $request->getVar('last_name');
-                $student->student_fname = $request->getVar('student_fname');
-                $student->student_lname = $request->getVar('student_lname');
-                $student->class_date = $request->getVar('class_date');
+                $parent->first_name = $request->getVar('first_name');
+                $parent->last_name = $request->getVar('last_name');
+                $parent->student_fname = $request->getVar('student_fname');
+                $parent->student_lname = $request->getVar('student_lname');
+                $parent->class_date = $request->getVar('class_date');
 
-                $new_user_id = $this->createNewUser($request->getVar('username'), $student);
-                $student->user_id = $new_user_id;
-                \ResourceFactory::saveResource($student);
+                $new_user_id = $this->createNewUser($request->getVar('username'), $parent);
+                $parent->user_id = $new_user_id;
+                \ResourceFactory::saveResource($parent);
                 break;
 
             case 'delete':
-                $this->deleteStudent($student);
+                $this->deleteParent($parent);
                 break;
 
             case 'approve';
                 exit('approve not written');
-                $student = $this->getStudent($student->id);
-                \ResourceFactory::saveResource($student);
+                $parent = $this->getParent($parent->id);
+                \ResourceFactory::saveResource($parent);
                 break;
         }
         $response = new \Http\SeeOtherResponse(\Server::getCurrentUrl(false));
         return $response;
     }
 
-    private function createNewUser($username, $student)
+    private function createNewUser($username, $parent)
     {
         $username = strtolower($username);
         $user = new \PHPWS_User;
@@ -108,7 +108,7 @@ class Students extends \Http\Controller {
         javascript('jquery');
         javascript('jquery_ui');
         \Layout::addJSHeader("<script type='text/javascript' src='" .
-                PHPWS_SOURCE_HTTP . "mod/always/javascript/Student/script.js'></script>");
+                PHPWS_SOURCE_HTTP . "mod/always/javascript/Parents/script.js'></script>");
         \Layout::addStyle('always', 'style.css');
 
         $cmd = $request->shiftCommand();
@@ -119,31 +119,31 @@ class Students extends \Http\Controller {
 
         switch ($cmd) {
             case 'list':
-                return $this->studentList($request);
+                return $this->parentList($request);
                 break;
 
             default:
                 $template = new \Template();
                 $template->setModuleTemplate('always',
-                        'Admin/Students/Student.html');
+                        'Admin/Parents/Parent.html');
                 $data = array_merge((array) $data,
-                        (array) $this->getStudent($cmd));
+                        (array) $this->getParent($cmd));
                 $template->addVariables($data);
                 return $template;
                 break;
         }
     }
 
-    private function studentList($request)
+    private function parentList($request)
     {
-        $student = new \always\Parent;
-        $form = $student->pullForm();
+        $parent = new \always\Parents;
+        $form = $parent->pullForm();
         $form->appendCSS('bootstrap');
-        $form->setAction('/always/admin/students');
+        $form->setAction('/always/admin/parents');
         $form->addHidden('command', 'save');
-        $form->addHidden('student_id', 0);
+        $form->addHidden('parent_id', 0);
 
-        if (!$student->getId()) {
+        if (!$parent->getId()) {
             $username = $form->addEmail('username');
             $username->setPlaceholder("Enter parent's email address");
         }
@@ -154,14 +154,14 @@ class Students extends \Http\Controller {
         $form->getSingleInput('student_lname')->setRequired()->setLabel('Last name');
         $form->getSingleInput('class_date')->setFirstBlank();
 
-        $form->addSubmit('submit', 'Save student');
+        $form->addSubmit('submit', 'Save parent');
         $data = $form->getInputStringArray();
         $data['menu'] = $this->menu->get($request);
 
         //var_dump($data);
 
         $template = new \Template($data);
-        $template->setModuleTemplate('always', 'Admin/Students/List.html');
+        $template->setModuleTemplate('always', 'Admin/Parents/List.html');
         return $template;
     }
 
@@ -169,17 +169,17 @@ class Students extends \Http\Controller {
     {
         if ($request->isVar('command')) {
             switch ($request->getVar('command')) {
-                case 'student':
-                    $data['student'] = $this->getStudent($request->getVar('id'));
+                case 'parent':
+                    $data['parent'] = $this->getParent($request->getVar('id'));
                     break;
             }
         } else {
             $db = \Database::newDB();
-            $student = $db->addTable('always_student');
-            $id = $student->addField('id');
-            $first_name = $student->addField('first_name');
-            $last_name = $student->addField('last_name');
-            $class_date = $student->addField('class_date');
+            $parent = $db->addTable('always_parent');
+            $id = $parent->addField('id');
+            $first_name = $parent->addField('first_name');
+            $last_name = $parent->addField('last_name');
+            $class_date = $parent->addField('class_date');
             $db->setGroupBy($last_name);
             $pager = new \DatabasePager($db);
             $pager->setHeaders(array('last_name', 'first_name', 'class_date'));
@@ -187,18 +187,18 @@ class Students extends \Http\Controller {
             $tbl_headers['first_name'] = $first_name;
             $tbl_headers['class_date'] = $class_date;
             $pager->setTableHeaders($tbl_headers);
-            $pager->setId('student-list');
+            $pager->setId('parent-list');
             $pager->setRowIdColumn('id');
             $data = $pager->getJson();
         }
         return parent::getJsonView($data, $request);
     }
 
-    private function getStudent($student_name)
+    private function getParent($parent_name)
     {
-        $name = explode('-', $student_name);
+        $name = explode('-', $parent_name);
         $db = \Database::newDB();
-        $co = $db->addTable('always_student');
+        $co = $db->addTable('always_parent');
         $db->setConditional($co->getFieldconditional('first_name', $name[0]));
         $db->setConditional($co->getFieldconditional('last_name', $name[1]));
         $result = $db->select();
