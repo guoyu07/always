@@ -31,7 +31,7 @@ class Students extends \Http\Controller {
 
     public function post(\Request $request)
     {
-        $student = new \always\Student;
+        $student = new \always\Parent;
         $student_id = $request->getVar('student_id');
         if ($student_id) {
             $student->id = $student_id;
@@ -136,7 +136,7 @@ class Students extends \Http\Controller {
 
     private function studentList($request)
     {
-        $student = new \always\Student;
+        $student = new \always\Parent;
         $form = $student->pullForm();
         $form->appendCSS('bootstrap');
         $form->setAction('/always/admin/students');

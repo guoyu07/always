@@ -8,28 +8,54 @@ namespace always\Controller;
  * @license http://opensource.org/licenses/lgpl-3.0.html
  */
 class Guest extends \Http\Controller {
-
-    public function getController(\Request $request)
+public function get(\Request $request)
     {
-        // we used shiftCommand in the Module. Here we use token because
-        // because we only want one command pulled from the url
-        $cmd = $request->getCurrentToken();
+        $data = array();
+        $view = $this->getView($data, $request);
+        $response = new \Response($view);
+        return $response;
+    }
+
+    public function getHtmlView($data, \Request $request)
+    {
+        $cmd = $request->shiftCommand();
         if (empty($cmd)) {
             $cmd = 'welcome';
         }
 
-        $controllers = array(
-            'welcome' => '\always\Controller\User\Welcome',
-            'profile' => '\always\Controller\User\Profile'
-        );
+        switch ($cmd) {
+            case 'welcome':
+                return self::welcome();
+                break;
 
-        if (!array_key_exists($cmd, $controllers)) {
-            throw new \Http\NotFoundException($request);
+            case 'view':
+                return $this->view();
+                break;
         }
+    }
 
-        $class = $controllers[$cmd];
-        $controller = new $class($this->getModule());
-        return $controller;
+    private function view()
+    {
+        $template = new \Template();
+        $template->setModuleTemplate('always', 'Parents/View.html');
+        $data = array('blah' => 'blah');
+        $template->addVariables($data);
+        return $template;
+    }
+
+    /**
+     * Called by the runTime in Module to appear on front page
+     * @return \Template
+     */
+    public static function welcome()
+    {
+        if (\Current_User::isLogged()) {
+        }
+        $data = array();
+        $template = new \Template();
+        $template->setModuleTemplate('always', 'Guest/Welcome.html');
+        $template->addVariables($data);
+        return $template;
     }
 
 }

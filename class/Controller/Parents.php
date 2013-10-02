@@ -32,6 +32,15 @@ class Parents extends \Http\Controller {
         return $controller;
     }
 
+    public static function getCurrentParent()
+    {
+        $profile = new \always\Parent;
+        $db = \Database\newDB();
+        $as = $db->addTable('always_student');
+        $as->addFieldConditional('user_id', \Current_User::getId());
+        $db->
+    }
+
 }
 
 ?>

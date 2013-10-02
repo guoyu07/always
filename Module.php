@@ -27,9 +27,18 @@ class Module extends \Module {
             $controller = $parents->getController($request);
         } else {
             $guest = new \always\Controller\Guest($this);
-            $controller = $guest->getController($request);
+            return $guest;
         }
         return $controller;
+    }
+
+    public function runTime(\Request $request)
+    {
+        $module = $request->getModule();
+        if (empty($module)) {
+            $template = Controller\Guest::welcome();
+            \Layout::add($template->get());
+        }
     }
 
 }

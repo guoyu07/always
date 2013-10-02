@@ -19,7 +19,7 @@ class Profile extends \Http\Controller {
 
     public function loadStudent()
     {
-        $this->student = new \always\Student;
+        $this->student = new \always\Parent;
 
         $user_id = \Current_User::getId();
         $db = \Database::newDB();

@@ -7,7 +7,7 @@ namespace always;
  * @author Matthew McNaney <mcnaney at gmail dot com>
  * @license http://opensource.org/licenses/lgpl-3.0.html
  */
-class Student extends \Resource {
+class Parent extends \Resource {
 
     /**
      * Id for each Student
