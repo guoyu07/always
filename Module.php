@@ -24,7 +24,7 @@ class Module extends \Module {
             $controller = $admin->getController($request);
         } elseif ($cmd == 'parent') {
             $parents = new \always\Controller\Parents($this);
-            $controller = $parents->getController($request);
+            return $parents;
         } else {
             $guest = new \always\Controller\Guest($this);
             return $guest;

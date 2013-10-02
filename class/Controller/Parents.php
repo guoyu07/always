@@ -9,27 +9,39 @@ namespace always\Controller;
  */
 class Parents extends \Http\Controller {
 
-    public function getController(\Request $request)
+    private $parent;
+
+    public function get(\Request $request)
     {
-        // we used shiftCommand in the Module. Here we use token because
-        // because we only want one command pulled from the url
-        $cmd = $request->getCurrentToken();
+        $data = array();
+        $view = $this->getView($data, $request);
+        $response = new \Response($view);
+        return $response;
+    }
+
+    public function getHtmlView($data, \Request $request)
+    {
+        $cmd = $request->shiftCommand();
+
         if (empty($cmd)) {
-            $cmd = 'welcome';
+            $cmd = 'view';
         }
 
-        $controllers = array(
-            'welcome' => '\always\Controller\User\Welcome',
-            'profile' => '\always\Controller\User\Profile'
-        );
-
-        if (!array_key_exists($cmd, $controllers)) {
-            throw new \Http\NotFoundException($request);
+        switch ($cmd) {
+            case 'view':
+                return $this->view();
+                break;
         }
+    }
 
-        $class = $controllers[$cmd];
-        $controller = new $class($this->getModule());
-        return $controller;
+    private function view()
+    {
+        $profile = \always\ProfileFactory::getCurrentProfile();
+        $data = array();
+        $template = new \Template();
+        $template->setModuleTemplate('always', 'Parents/View.html');
+        $template->addVariables($data);
+        return $template;
     }
 
     public static function getCurrentParent()
@@ -39,7 +51,8 @@ class Parents extends \Http\Controller {
         $ap = $db->addTable('always_parents');
         $ap->addFieldConditional('user_id', \Current_User::getId());
         $db->selectInto($parent);
-        return $parent;
+        $this->parent = $parent;
+        return $this->parent;
     }
 
 }
