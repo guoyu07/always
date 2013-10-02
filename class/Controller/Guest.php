@@ -49,9 +49,16 @@ public function get(\Request $request)
      */
     public static function welcome()
     {
-        if (\Current_User::isLogged()) {
-        }
         $data = array();
+        $data['parent'] = false;
+        if (\Current_User::isLogged()) {
+            $parent = \always\Controller\Parents::getCurrentParent();
+            if ($parent->id) {
+                $data['parent'] = true;
+                $data['student_fname'] = $parent->student_fname;
+                $data['student_lname'] = $parent->student_lname;
+            }
+        }
         $template = new \Template();
         $template->setModuleTemplate('always', 'Guest/Welcome.html');
         $template->addVariables($data);

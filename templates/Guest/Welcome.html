@@ -12,6 +12,12 @@
         <form>
           <input type="text" name="always_search" placeholder="Search for student" id="always-search" /> <button class="btn btn-default">Find</button>
         </form>
+        
+        <?php if ($parent): ?>
+        <div class="text-center">
+            <a href="always/parent/"><button class="btn btn-default">View <?=$student_fname, ' ', $student_lname?> Profile</button></a>
+        </div>
+        <?php endif; ?>
       </div>
     <div class="border-box bottom-box"></div>
   </div>
