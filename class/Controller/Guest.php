@@ -19,7 +19,8 @@ class Guest extends \Http\Controller {
 
     public function getHtmlView($data, \Request $request)
     {
-        $cmd = $request->shiftCommand();
+        $cmd = $request->lastCommand();
+
         if (empty($cmd)) {
             $cmd = 'welcome';
         }
@@ -29,21 +30,27 @@ class Guest extends \Http\Controller {
                 return self::welcome();
                 break;
 
-            case 'view':
-                return $this->view();
-                break;
+            default:
+                $profile = \always\ProfileFactory::getProfileByName($cmd);
+                if ($profile->isSaved()) {
+                    return \always\ProfileFactory::displayProfile($profile);
+                }
+
+                $response = new \Http\NotFoundResponse;
+                return new \View\HtmlErrorView($request, $response);
         }
     }
 
+    /*
     private function view()
     {
         $template = new \Template();
         $template->setModuleTemplate('always', 'Parents/View.html');
-        $data = array('blah' => 'blah');
+        $data = array();
         $template->addVariables($data);
         return $template;
     }
-
+*/
     /**
      * Called by the runTime in Module to appear on front page
      * @return \Template
@@ -53,11 +60,15 @@ class Guest extends \Http\Controller {
         $data = array();
         $data['parent'] = false;
         if (\Current_User::isLogged()) {
-            $parent = \always\Controller\Parents::getCurrentParent();
+            $parent = \always\ParentFactory::getCurrentParent();
             if ($parent->id) {
                 $data['parent'] = true;
-                $data['student_fname'] = $parent->student_fname;
-                $data['student_lname'] = $parent->student_lname;
+                $profile = \always\ProfileFactory::getCurrentUserProfile();
+                if ($profile->isSaved()) {
+                    $data['button'] = 'View ' . $profile->getFullName();
+                } else {
+                    $data['button'] = 'Create a new profile';
+                }
             }
         }
         $template = new \Template();

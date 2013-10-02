@@ -38,21 +38,6 @@ class Parents extends \Resource {
     protected $last_name;
 
     /**
-     * @var Variable\String
-     */
-    protected $student_fname;
-
-    /**
-     * @var Variable\String
-     */
-    protected $student_lname;
-
-    /**
-     * @var Variable\String
-     */
-    protected $class_date;
-
-    /**
      * The Database table
      * @var Variable\String
      */
@@ -67,13 +52,6 @@ class Parents extends \Resource {
         $this->first_name->allowEmpty(false);
         $this->last_name = new \Variable\String(null, 'last_name');
         $this->last_name->allowEmpty(false);
-        $this->student_fname = new \Variable\String(null, 'student_fname');
-        $this->student_fname->allowEmpty(false);
-        $this->student_lname = new \Variable\String(null, 'student_lname');
-        $this->student_lname->allowEmpty(false);
-        $this->class_date = new \Variable\Integer(null, 'class_date');
-        $this->class_date->setRange(1950, date('Y') + 1);
-        $this->class_date->setInputType('select');
         $this->username = new \Variable\Email(null, 'username');
     }
 
@@ -91,6 +69,34 @@ class Parents extends \Resource {
     {
         return (bool) $this->submitted->get();
     }
+
+
+    private function loadUsername()
+    {
+        $db = \Database::newDB();
+        $us = $db->addTable('users');
+        $us->addField('username');
+        $ap = $db->addTable('always_parents', null, false);
+        $db->addConditional($db->createConditional($us->getField('id'),
+                        $ap->getField('user_id')));
+        $ap->addFieldConditional('id', $this->id);
+        $result = $db->selectOneRow();
+        if (!isset($result['username'])) {
+            throw new \Exception('Could not load user name for parent with id=' . $this->id);
+        } else {
+            $this->username->set($result['username']);
+        }
+    }
+
+    public function getUsername()
+    {
+        if ($this->username->isEmpty()) {
+            $this->loadUsername();
+        }
+        return $this->username->get();
+    }
+
+
 }
 
 ?>

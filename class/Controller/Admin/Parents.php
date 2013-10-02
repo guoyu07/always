@@ -43,9 +43,6 @@ class Parents extends \Http\Controller {
             case 'save':
                 $parent->first_name = $request->getVar('first_name');
                 $parent->last_name = $request->getVar('last_name');
-                $parent->student_fname = $request->getVar('student_fname');
-                $parent->student_lname = $request->getVar('student_lname');
-                $parent->class_date = $request->getVar('class_date');
 
                 $new_user_id = $this->createNewUser($request->getVar('username'), $parent);
                 $parent->user_id = $new_user_id;
@@ -150,9 +147,6 @@ class Parents extends \Http\Controller {
 
         $form->getSingleInput('first_name')->setRequired();
         $form->getSingleInput('last_name')->setRequired();
-        $form->getSingleInput('student_fname')->setRequired()->setLabel('First name');
-        $form->getSingleInput('student_lname')->setRequired()->setLabel('Last name');
-        $form->getSingleInput('class_date')->setFirstBlank();
 
         $form->addSubmit('submit', 'Save parent');
         $data = $form->getInputStringArray();
@@ -178,13 +172,11 @@ class Parents extends \Http\Controller {
             $id = $parent->addField('id');
             $first_name = $parent->addField('first_name');
             $last_name = $parent->addField('last_name');
-            $class_date = $parent->addField('class_date');
             $db->setGroupBy($last_name);
             $pager = new \DatabasePager($db);
-            $pager->setHeaders(array('last_name', 'first_name', 'class_date'));
+            $pager->setHeaders(array('last_name', 'first_name'));
             $tbl_headers['last_name'] = $last_name;
             $tbl_headers['first_name'] = $first_name;
-            $tbl_headers['class_date'] = $class_date;
             $pager->setTableHeaders($tbl_headers);
             $pager->setId('parent-list');
             $pager->setRowIdColumn('id');
