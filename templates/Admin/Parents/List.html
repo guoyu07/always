@@ -1,9 +1,8 @@
 <?php echo $menu ?>
-
 <div class="pager-listing bg-tl" id="student-list" data-rpp="10">
     <div class="row">
         <div class="span3 pull-right pager-search"></div>
-        <div class="span2"><button class="btn btn-primary" id="new-student">Create student</button></div>
+        <div class="span2"><button class="btn btn-primary" id="new-parent">Create parent</button></div>
     </div>
     <div class="row">
         <table class="table table-striped">
@@ -25,7 +24,7 @@
     </div>
     <div id="page-list" style="text-align:center"></div>
 </div>
-<div id="student-options">
+<div id="parent-options">
     <?php echo $form_start ?>
     <?php echo $username_group ?>
     <fieldset>
@@ -34,7 +33,7 @@
     <?php echo $last_name_group ?>
     </fieldset>
     <fieldset>
-        <legend>Student information</legend>
+        <legend>Parent information</legend>
     <?php echo $student_fname_group ?>
     <?php echo $student_lname_group ?>
     </fieldset>

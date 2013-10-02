@@ -14,11 +14,11 @@ class Admin extends \Http\Controller {
         $cmd = $request->shiftCommand();
 
         if (empty($cmd)) {
-            $cmd = 'students';
+            $cmd = 'parents';
         }
 
         $controllers = array(
-            'students' => '\always\Controller\Admin\Students',
+            'parents' => '\always\Controller\Admin\Parents',
         );
 
         if (!array_key_exists($cmd, $controllers)) {

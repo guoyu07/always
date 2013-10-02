@@ -56,7 +56,7 @@ class Parents extends \Resource {
      * The Database table
      * @var Variable\String
      */
-    protected $table = 'always_parents';
+    protected $table = 'always_parentss';
 
     public function __construct()
     {
