@@ -75,6 +75,11 @@ class Profile extends \Resource {
         $this->approved = new \Variable\Bool(0, 'approved');
     }
 
+    public function getData()
+    {
+        return $this->getVars();
+    }
+
 }
 
 ?>

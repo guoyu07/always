@@ -7,18 +7,15 @@ namespace always\Controller;
  * @author Matthew McNaney <mcnaney at gmail dot com>
  * @license http://opensource.org/licenses/lgpl-3.0.html
  */
-class User extends \Http\Controller {
+class Parents extends \Http\Controller {
 
     public function getController(\Request $request)
     {
-        $cmd = $request->shiftCommand();
-
+        // we used shiftCommand in the Module. Here we use token because
+        // because we only want one command pulled from the url
+        $cmd = $request->getCurrentToken();
         if (empty($cmd)) {
-            if (!\Current_User::isLogged()) {
-                $cmd = 'welcome';
-            } else {
-                $cmd = 'profile';
-            }
+            $cmd = 'welcome';
         }
 
         $controllers = array(

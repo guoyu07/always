@@ -22,8 +22,12 @@ class Module extends \Module {
         if ($cmd == 'admin' && \Current_User::allow('always')) {
             $admin = new \always\Controller\Admin($this);
             $controller = $admin->getController($request);
+        } elseif ($cmd == 'parent') {
+            $parents = new \always\Controller\Parents($this);
+            $controller = $parents->getController($request);
         } else {
-            $controller = new \always\Controller\User($this);
+            $guest = new \always\Controller\Guest($this);
+            $controller = $guest->getController($request);
         }
         return $controller;
     }
