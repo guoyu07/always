@@ -1,14 +1,20 @@
 <div class="bg-tl">
-    <p>The Student Memorial Program remembers and honors Appalachian students who have passed away while enrolled as a student.
-    Each student is memorialized on a plaque in the B.B. Dougherty Administration Building.
-    Appalachian annually invites each of these students' families to campus in the Fall
-    for a special Student Memorial Program. This program honors and remembers each of these
-    Mountaineers by reading their names and words of remembrance from the family.</p>
-    
+    <p>The Student Memorial Program remembers and honors Appalachian students who have passed away
+        while enrolled as a student.
+        Each student is memorialized on a plaque in the B.B. Dougherty Administration Building.
+        Appalachian annually invites each of these students' families to campus in the Fall
+        for a special Student Memorial Program. This program honors and remembers each of these
+        Mountaineers by reading their names and words of remembrance from the family.</p>
+
     <p class="lead" style="text-align:center;">These students will "Always be a Mountaineer."</p>
 
     <form>
         <input type="text" name="always_search" placeholder="Search for student" id="always-search" /> <button class="btn btn-default">Find</button>
     </form>
 </div>
+<?php if ($parent): ?>
+<div class="text-center">
+    <a href="always/parent/"><button class="btn btn-default">View my student</button></a>
+</div>
+<?php endif; ?>
 
