@@ -63,7 +63,7 @@ class Guest extends \Http\Controller {
             $parent = \always\ParentFactory::getCurrentParent();
             if ($parent->id) {
                 $data['parent'] = true;
-                $profile = \always\ProfileFactory::getCurrentUserProfile();
+                $profile = \always\ProfileFactory::getCurrentUserProfile(false);
                 if ($profile->isSaved()) {
                     $data['button'] = 'View ' . $profile->getFullName();
                 } else {

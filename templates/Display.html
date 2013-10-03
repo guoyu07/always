@@ -9,6 +9,12 @@
             <h2><?=$full_name?></h2>
         </div>
         
+        <?php if ($parent): ?>
+        <div class="text-center">
+            <a href="always/parent/edit"><button class="btn btn-default"><?=$button?></button></a>
+        </div>
+        <?php endif; ?>
+
         <div class="class-date"><?=$class_date?></div>
         <div class="summary"><?=$summary?></div>
     </div>

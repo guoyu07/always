@@ -33,16 +33,16 @@ class ProfileFactory {
 
         $db = \Database::newDB();
         $prot = $db->addTable('always_profile');
-        $part = $db->addTable('always_parents');
+        $part = $db->addTable('always_parents', null, false);
 
         $prot->addOrderBy($prot->getField('version'), 'desc');
 
         $db->addConditional($part->getFieldConditional('user_id', $user_id));
         $db->addConditional($db->createConditional($part->getField('id'),
                         $prot->getField('parent_id')));
-
-        $db->addConditional($prot->getFieldConditional('approved',
-                        (int) (bool) $approved));
+        if ($approved) {
+            $db->addConditional($prot->getFieldConditional('approved', 1));
+        }
         $db->setLimit(1);
         $result = $db->selectOneRow();
         if (!empty($result)) {
@@ -80,10 +80,20 @@ class ProfileFactory {
     {
         $data = $profile->getStringVars();
         $data['full_name'] = $profile->getFullName();
+
+        $parent = ParentFactory::getParentById($profile->getParentId());
+        if ($parent->getUserId() == \Current_User::getId()) {
+            $data['parent'] = true;
+            $data['button'] = 'Update ' . $profile->getFullName();
+        }
+
+        if (!empty($data['profile_pic'])) {
+            $data['profile_pic'] = '<img src="' . $data['profile_pic'] . '" />';
+        }
+
         $template = new \Template($data);
         $template->setModuleTemplate('always', 'Display.html');
         return $template;
-
     }
 
     public static function editCurrentUserProfile()

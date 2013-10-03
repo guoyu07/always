@@ -96,6 +96,11 @@ class Parents extends \Resource {
         return $this->username->get();
     }
 
+    public function getUserId()
+    {
+        return $this->user_id->get();
+    }
+
 
 }
 
