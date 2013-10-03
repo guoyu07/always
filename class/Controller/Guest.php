@@ -41,16 +41,6 @@ class Guest extends \Http\Controller {
         }
     }
 
-    /*
-    private function view()
-    {
-        $template = new \Template();
-        $template->setModuleTemplate('always', 'Parents/View.html');
-        $data = array();
-        $template->addVariables($data);
-        return $template;
-    }
-*/
     /**
      * Called by the runTime in Module to appear on front page
      * @return \Template
@@ -65,6 +55,7 @@ class Guest extends \Http\Controller {
                 $data['parent'] = true;
                 $profile = \always\ProfileFactory::getCurrentUserProfile(false);
                 if ($profile->isSaved()) {
+                    $data['student_address'] = $profile->getViewUrl();
                     $data['button'] = 'View ' . $profile->getFullName();
                 } else {
                     $data['button'] = 'Create a new profile';

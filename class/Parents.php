@@ -49,8 +49,10 @@ class Parents extends \Resource {
         $this->id = new \Variable\Integer(null, 'id');
         $this->user_id = new \Variable\Integer(null, 'user_id');
         $this->first_name = new \Variable\String(null, 'first_name');
+        $this->first_name->setLimit(50);
         $this->first_name->allowEmpty(false);
         $this->last_name = new \Variable\String(null, 'last_name');
+        $this->last_name->setLimit(50);
         $this->last_name->allowEmpty(false);
         $this->username = new \Variable\Email(null, 'username');
     }
@@ -94,6 +96,11 @@ class Parents extends \Resource {
             $this->loadUsername();
         }
         return $this->username->get();
+    }
+
+    public function setUserId($user_id)
+    {
+        $this->user_id->set($user_id);
     }
 
     public function getUserId()
