@@ -12,7 +12,6 @@ class Parents extends \Http\Controller {
 
     private $menu;
 
-
     public function __construct(\Module $module)
     {
         parent::__construct($module);
@@ -34,18 +33,21 @@ class Parents extends \Http\Controller {
         $parent = new \always\Parents;
         $parent_id = $request->getVar('parent_id');
         if ($parent_id) {
-            $parent->id = $parent_id;
-            \ResourceFactory::loadByID($parent);
+            $parent = \always\ParentFactory::getParentById($parent_id);
+        } else {
+            $parent = new \always\Parents;
         }
-
 
         switch ($request->getVar('command')) {
             case 'save':
-                $parent->first_name = $request->getVar('first_name');
-                $parent->last_name = $request->getVar('last_name');
+                $parent->setFirstName($request->getVar('first_name'));
+                $parent->setLastName($request->getVar('last_name'));
 
-                $new_user_id = $this->createNewUser($request->getVar('username'), $parent);
-                $parent->user_id = $new_user_id;
+                if (!$parent->isSaved()) {
+                    $new_user_id = $this->createNewUser($request->getVar('username'),
+                            $parent);
+                    $parent->setUserId($new_user_id);
+                }
                 \ResourceFactory::saveResource($parent);
                 break;
 
@@ -165,24 +167,43 @@ class Parents extends \Http\Controller {
                 case 'parent':
                     $data['parent'] = $this->getParent($request->getVar('id'));
                     break;
+
+                case 'edit_parent':
+                    $data = $this->editParentJson($request);
+                    break;
             }
         } else {
             $db = \Database::newDB();
             $parent = $db->addTable('always_parents');
-            $id = $parent->addField('id');
+            $users = $db->addTable('users');
+            $parent->addField('id');
             $first_name = $parent->addField('first_name');
             $last_name = $parent->addField('last_name');
+            $username = $users->addField('username');
+            $db->addConditional($db->createConditional($users->getField('id'),
+                            $parent->getField('user_id')));
             $db->setGroupBy($last_name);
             $pager = new \DatabasePager($db);
-            $pager->setHeaders(array('last_name', 'first_name'));
+            $pager->setHeaders(array('last_name', 'first_name', 'username'));
             $tbl_headers['last_name'] = $last_name;
             $tbl_headers['first_name'] = $first_name;
+            $tbl_headers['username'] = $username;
             $pager->setTableHeaders($tbl_headers);
             $pager->setId('parent-list');
             $pager->setRowIdColumn('id');
+            $pager->showQuery();
             $data = $pager->getJson();
         }
         return parent::getJsonView($data, $request);
+    }
+
+    private function editParentJson(\Request $request)
+    {
+        $profile = \always\ParentFactory::getParentById($request->getVar('pid'));
+        $data['first_name'] = $profile->getFirstName();
+        $data['last_name'] = $profile->getLastName();
+        $data['username'] = $profile->getUsername();
+        return $data;
     }
 
     private function getParent($parent_name)

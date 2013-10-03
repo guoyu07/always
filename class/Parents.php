@@ -101,6 +101,31 @@ class Parents extends \Resource {
         return $this->user_id->get();
     }
 
+    public function getFirstName()
+    {
+        return $this->first_name->get();
+    }
+
+    public function getLastName()
+    {
+        return $this->last_name->get();
+    }
+
+    public function setFirstName($first_name)
+    {
+        $this->first_name->set($first_name);
+    }
+
+    public function setLastName($last_name)
+    {
+        $this->last_name->set($last_name);
+    }
+
+    public function getFullName()
+    {
+        return $this->getFirstName() . ' ' . $this->getLastName();
+    }
+
 
 }
 
