@@ -12,12 +12,14 @@
                 <tr>
                     <th class="pager-header first_name"></th>
                     <th class="pager-header last_name"></th>
+                    <th class="pager-header username"></th>
                 </tr>
             </thead>
             <tbody class="pager-body">
                 <tr class="pager-row pointer" data-row-id="">
                     <td class="pager-column first_name"></td>
                     <td class="pager-column last_name"></td>
+                    <td class="pager-column username"></td>
                 </tr>
             </tbody>
         </table>
@@ -26,7 +28,7 @@
     <div id="page-list" style="text-align:center"></div>
 </div>
 
-<div id="parent-options">
+<div id="parent-options" style="display:none">
     <?php echo $form_start ?>
     <?php echo $username_group ?>
     <fieldset>

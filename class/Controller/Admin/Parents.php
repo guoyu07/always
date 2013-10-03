@@ -169,17 +169,22 @@ class Parents extends \Http\Controller {
         } else {
             $db = \Database::newDB();
             $parent = $db->addTable('always_parents');
+            $users = $db->addTable('users');
             $id = $parent->addField('id');
             $first_name = $parent->addField('first_name');
             $last_name = $parent->addField('last_name');
+            $username = $users->addField('username');
+            $db->addConditional($db->createConditional($users->getField('id'), $parent->getField('user_id')));
             $db->setGroupBy($last_name);
             $pager = new \DatabasePager($db);
-            $pager->setHeaders(array('last_name', 'first_name'));
+            $pager->setHeaders(array('last_name', 'first_name', 'username'));
             $tbl_headers['last_name'] = $last_name;
             $tbl_headers['first_name'] = $first_name;
+            $tbl_headers['username'] = $username;
             $pager->setTableHeaders($tbl_headers);
             $pager->setId('parent-list');
             $pager->setRowIdColumn('id');
+            $pager->showQuery();
             $data = $pager->getJson();
         }
         return parent::getJsonView($data, $request);
