@@ -1,5 +1,23 @@
-<div class="profile-pic"><?=$profile_pic?></div>
-<div class="full-name"><?=$full_name?></div>
-<div class="class-date"><?=$class_date?></div>
-<div class="story"><?=$story?></div>
-<div class="summary"><?=$summary?></div>
+<div class="row">
+    <div class="col-lg-3">
+        <div class="profile-pic bg-tl">
+            <?=$profile_pic?>
+        </div>
+    </div>
+    <div class="col-lg-7 col-lg-offset-1 bg-tl">
+        <div class="full-name">
+            <h2><?=$full_name?></h2>
+        </div>
+        
+        <div class="class-date"><?=$class_date?></div>
+        <div class="summary"><?=$summary?></div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-9 col-lg-push-3">
+        <div class="border-box top-box"></div>
+        <div class="story bg-tl"><?=$story?></div>
+        <div class="border-box bottom-box"></div>
+    </div>
+</div>
