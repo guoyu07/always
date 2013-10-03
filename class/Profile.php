@@ -92,8 +92,10 @@ class Profile extends \Resource {
         $this->bg = new \Variable\Integer(null, 'bg');
         $this->first_name = new \Variable\String(null, 'first_name');
         $this->first_name->allowEmpty(false);
+        $this->first_name->setLimit(50);
         $this->last_name = new \Variable\String(null, 'last_name');
         $this->last_name->allowEmpty(false);
+        $this->last_name->setLimit(50);
         $this->class_date = new \Variable\Integer(null, 'class_date');
         $this->class_date->setRange(1950, date('Y') + 1);
         $this->class_date->setInputType('select');
