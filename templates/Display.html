@@ -4,10 +4,12 @@
             <?=$profile_pic?>
         </div>
     </div>
-    <div class="col-lg-7 col-lg-offset-1 bg-tl">
+    <div class="col-lg-9">
+        <div class="border-box top-box"></div>
+        <div class="bg-tl">
 
         <?php if ($parent): ?>
-            <div class="pull-right" style="margin-top: 15px;">
+            <div class="pull-right" style="margin-top: 15px; margin-right: 15px;">
                 <div class="text-center">
                     <a href="always/parent/edit"><button class="btn btn-default btn-sm"><i class="icon-pencil"></i> <?=$button?></button></a>
                 </div>
@@ -15,12 +17,16 @@
         <?php endif; ?>
 
 
-        <div class="full-name">
-            <h2><?=$full_name?></h2>
-        </div>
+            <h2 class="student-name" ><?=$full_name?></h2>
 
-                <div class="class-date"><?=$class_date?></div>
-        <div class="summary"><?=$summary?></div>
+            <p>
+                Class of <?=$class_date?>
+            </p>
+            <p class="lead student-summary">
+                <?=$summary?>
+            </p>
+        </div>
+        <div class="border-box bottom-box"></div>
     </div>
 </div>
 
