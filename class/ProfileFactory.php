@@ -87,9 +87,11 @@ class ProfileFactory {
             $data['button'] = 'Update ' . $profile->getFullName();
         }
 
+        /*
         if (!empty($data['profile_pic'])) {
             $data['profile_pic'] = '<img src="' . $data['profile_pic'] . '" />';
         }
+        */
 
         $template = new \Template($data);
         $template->setModuleTemplate('always', 'Display.html');
