@@ -5,17 +5,21 @@
         </div>
     </div>
     <div class="col-lg-7 col-lg-offset-1 bg-tl">
+
+        <?php if ($parent): ?>
+            <div class="pull-right" style="margin-top: 15px;">
+                <div class="text-center">
+                    <a href="always/parent/edit"><button class="btn btn-default btn-sm"><i class="icon-pencil"></i> <?=$button?></button></a>
+                </div>
+            </div>
+        <?php endif; ?>
+
+
         <div class="full-name">
             <h2><?=$full_name?></h2>
         </div>
-        
-        <?php if ($parent): ?>
-        <div class="text-center">
-            <a href="always/parent/edit"><button class="btn btn-default"><?=$button?></button></a>
-        </div>
-        <?php endif; ?>
 
-        <div class="class-date"><?=$class_date?></div>
+                <div class="class-date"><?=$class_date?></div>
         <div class="summary"><?=$summary?></div>
     </div>
 </div>
