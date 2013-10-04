@@ -58,6 +58,7 @@ class Guest extends \Http\Controller {
                     $data['student_address'] = $profile->getViewUrl();
                     $data['button'] = 'View ' . $profile->getFullName();
                 } else {
+                    $data['student_address'] = 'always/parent/';
                     $data['button'] = 'Create a new profile';
                 }
             }
