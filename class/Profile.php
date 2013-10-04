@@ -180,12 +180,12 @@ class Profile extends \Resource {
 
     public function setFirstName($name)
     {
-        $this->first_name->set(ucwords($name));
+        $this->first_name->set(ucwords(trim($name)));
     }
 
     public function setLastName($name)
     {
-        $this->last_name->set(ucwords($name));
+        $this->last_name->set(ucwords(trim($name)));
     }
 
     public function getFullName()
