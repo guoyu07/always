@@ -88,10 +88,10 @@ class ProfileFactory {
         }
 
         /*
-        if (!empty($data['profile_pic'])) {
-            $data['profile_pic'] = '<img src="' . $data['profile_pic'] . '" />';
-        }
-        */
+          if (!empty($data['profile_pic'])) {
+          $data['profile_pic'] = '<img src="' . $data['profile_pic'] . '" />';
+          }
+         */
 
         $template = new \Template($data);
         $template->setModuleTemplate('always', 'Display.html');
@@ -106,6 +106,9 @@ class ProfileFactory {
 
     public static function editProfile(Profile $profile, Parents $parent)
     {
+        javascript('jquery');
+        \Layout::addJSHeader("<script type='text/javascript' src='" .
+                PHPWS_SOURCE_HTTP . "mod/always/javascript/ckeditor/ckeditor.js'></script>");
         $form = $profile->pullForm();
         $form->setEnctype(\Form::enctype_multipart);
         $form->appendCSS('bootstrap');
