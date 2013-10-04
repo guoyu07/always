@@ -120,12 +120,12 @@ class Parents extends \Resource {
 
     public function setFirstName($first_name)
     {
-        $this->first_name->set($first_name);
+        $this->first_name->set(strip_tags(trim($first_name)));
     }
 
     public function setLastName($last_name)
     {
-        $this->last_name->set($last_name);
+        $this->last_name->set(strip_tags(trim($last_name)));
     }
 
     public function getFullName()
