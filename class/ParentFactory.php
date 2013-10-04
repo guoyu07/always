@@ -34,6 +34,20 @@ class ParentFactory {
         return $parent;
     }
 
+    public static function deleteParentById($id)
+    {
+        $parent = self::getParentById($id);
+        if (!$parent->isSaved()) {
+            throw new \Exception("Parent id $id not found");
+        }
+        $db = \Database::newDB();
+        $db->addTable('always_parents')->addFieldConditional('id', $id);
+        $db->delete();
+
+        $user = new \PHPWS_User($parent->getUserId());
+        $user->kill();
+    }
+
 }
 
 ?>
