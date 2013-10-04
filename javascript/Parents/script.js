@@ -44,7 +44,12 @@ function parent() {
         $('#delete-button').click(function() {
             $('.confirm', this).html('Click again to confirm deletion');
             $('#delete-button').click(function() {
-
+                $.get('always/admin/parents/', {
+                    'command': 'delete_parent',
+                    'pid' : $('#parent-id').val()
+                }, function(){
+                    window.location.reload();
+                }, 'json');
             });
         });
     };
