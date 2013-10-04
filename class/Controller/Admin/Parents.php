@@ -120,16 +120,6 @@ class Parents extends \Http\Controller {
             case 'list':
                 return $this->parentList($request);
                 break;
-
-            default:
-                $template = new \Template();
-                $template->setModuleTemplate('always',
-                        'Admin/Parents/Parent.html');
-                $data = array_merge((array) $data,
-                        (array) $this->getParent($cmd));
-                $template->addVariables($data);
-                return $template;
-                break;
         }
     }
 
@@ -153,8 +143,6 @@ class Parents extends \Http\Controller {
         $form->addSubmit('submit', 'Save parent');
         $data = $form->getInputStringArray();
 
-        //var_dump($data);
-
         $template = new \Template($data);
         $template->setModuleTemplate('always', 'Admin/Parents/List.html');
         return $template;
@@ -164,12 +152,12 @@ class Parents extends \Http\Controller {
     {
         if ($request->isVar('command')) {
             switch ($request->getVar('command')) {
-                case 'parent':
-                    $data['parent'] = $this->getParent($request->getVar('id'));
-                    break;
-
                 case 'edit_parent':
                     $data = $this->editParentJson($request);
+                    break;
+
+                case 'delete_parent':
+                    $data = $this->deleteParentJson($request);
                     break;
             }
         } else {
@@ -191,10 +179,14 @@ class Parents extends \Http\Controller {
             $pager->setTableHeaders($tbl_headers);
             $pager->setId('parent-list');
             $pager->setRowIdColumn('id');
-            $pager->showQuery();
             $data = $pager->getJson();
         }
         return parent::getJsonView($data, $request);
+    }
+
+    private function deleteParentJson(\Request $request)
+    {
+        \always\ParentFactory::deleteParentById($request->getVar('pid'));
     }
 
     private function editParentJson(\Request $request)
@@ -204,28 +196,6 @@ class Parents extends \Http\Controller {
         $data['last_name'] = $profile->getLastName();
         $data['username'] = $profile->getUsername();
         return $data;
-    }
-
-    private function getParent($parent_name)
-    {
-        $name = explode('-', $parent_name);
-        $db = \Database::newDB();
-        $co = $db->addTable('always_parents');
-        $db->setConditional($co->getFieldconditional('first_name', $name[0]));
-        $db->setConditional($co->getFieldconditional('last_name', $name[1]));
-        $result = $db->select();
-
-        if (empty($result[0])) {
-            return null;
-        }
-
-        if ($result[0]['submitted']) {
-            $result[0]['approve'] = '<button type="submit" class="btn btn-primary" name="command" value="approve" />Approve</button>';
-        }
-        else
-            $result[0]['approve'] = "";
-
-        return $result[0];
     }
 
 }
