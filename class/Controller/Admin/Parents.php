@@ -15,7 +15,7 @@ class Parents extends \Http\Controller {
     public function __construct(\Module $module)
     {
         parent::__construct($module);
-        $this->menu = new \always\Menu;
+        //$this->menu = new \always\Menu;
     }
 
     public function get(\Request $request)
