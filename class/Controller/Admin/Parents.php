@@ -2,6 +2,8 @@
 
 namespace always\Controller\Admin;
 
+require_once PHPWS_SOURCE_DIR . 'mod/always/inc/defines.php';
+
 /**
  * The controller for parent administration.
  *
@@ -11,61 +13,68 @@ namespace always\Controller\Admin;
 class Parents extends \Http\Controller {
 
     private $menu;
+    private $parent;
 
     public function __construct(\Module $module)
     {
         parent::__construct($module);
-        //$this->menu = new \always\Menu;
     }
 
     public function get(\Request $request)
     {
-        $nrequest = $request->getNextRequest();
-        $token = $nrequest->getCurrentToken();
         $data = array();
         $view = $this->getView($data, $request);
         $response = new \Response($view);
         return $response;
     }
 
-    public function post(\Request $request)
+    private function loadParent($request)
     {
-        $parent = new \always\Parents;
         $parent_id = $request->getVar('parent_id');
         if ($parent_id) {
-            $parent = \always\ParentFactory::getParentById($parent_id);
+            $this->parent = \always\ParentFactory::getParentById($parent_id);
         } else {
-            $parent = new \always\Parents;
+            $this->parent = new \always\Parents;
         }
+    }
+
+    private function saveParent(\Request $request)
+    {
+        $this->parent->setFirstName($request->getVar('first_name'));
+        $this->parent->setLastName($request->getVar('last_name'));
+        if (!$this->parent->isSaved()) {
+            $new_user_id = $this->createNewUser($request->getVar('username'));
+            $this->parent->setUserId($new_user_id);
+        }
+        \ResourceFactory::saveResource($this->parent);
+
+        $profile = new \always\Profile;
+        $profile->setFirstName($request->getVar('student_first_name'));
+        $profile->setLastName($request->getVar('student_last_name'));
+        $profile->setClassDate($request->getVar('class_date'));
+        $profile->setParentId($this->parent->getId());
+
+        \always\ProfileFactory::saveProfile($profile);
+    }
+
+    public function post(\Request $request)
+    {
+        $this->loadParent($request);
 
         switch ($request->getVar('command')) {
             case 'save':
-                $parent->setFirstName($request->getVar('first_name'));
-                $parent->setLastName($request->getVar('last_name'));
-
-                if (!$parent->isSaved()) {
-                    $new_user_id = $this->createNewUser($request->getVar('username'),
-                            $parent);
-                    $parent->setUserId($new_user_id);
-                }
-                \ResourceFactory::saveResource($parent);
+                $this->saveParent($request);
                 break;
 
             case 'delete':
-                $this->deleteParent($parent);
-                break;
-
-            case 'approve';
-                exit('approve not written');
-                $parent = $this->getParent($parent->id);
-                \ResourceFactory::saveResource($parent);
+                $this->deleteParent();
                 break;
         }
         $response = new \Http\SeeOtherResponse(\Server::getCurrentUrl(false));
         return $response;
     }
 
-    private function createNewUser($username, $parent)
+    private function createNewUser($username)
     {
         $username = strtolower($username);
         $user = new \PHPWS_User;
@@ -102,14 +111,7 @@ class Parents extends \Http\Controller {
 
     public function getHtmlView($data, \Request $request)
     {
-        // JQuery called in prepare
-        \Pager::prepare();
-        javascript('jquery');
-        javascript('jquery_ui');
-        \Layout::addJSHeader("<script type='text/javascript' src='" .
-                PHPWS_SOURCE_HTTP . "mod/always/javascript/Parents/script.js'></script>");
-        \Layout::addStyle('always', 'style.css');
-
+        $this->loadMenu();
         $cmd = $request->shiftCommand();
 
         if (empty($cmd)) {
@@ -118,27 +120,67 @@ class Parents extends \Http\Controller {
 
         switch ($cmd) {
             case 'list':
-                return $this->parentList($request);
+                $template = $this->listing($request);
+                break;
+
+            case 'edit':
+                $template = $this->editCurrentProfile($request);
                 break;
         }
+        $template->add('menu', $this->menu->get());
+        return $template;
     }
 
-    private function parentList($request)
+    private function loadMenu()
     {
+        $this->menu = new \always\Menu('parents');
+    }
+
+    /**
+     * Administrator
+     * --------------
+     * If unapproval, force approval.
+     * If unsubmitted, edit current approved version, flag as admin edited
+     * If no submission waiting, edit current approved version, flag as admin edited
+     *
+     */
+    private function editCurrentProfile(\Request $request)
+    {
+        $this->loadParent($request);
+        $profile = \always\ProfileFactory::getProfileByOriginalId($request->getVar('original_id'));
+        $template = \always\ProfileFactory::editProfile($profile, $this->parent);
+        return $template;
+    }
+
+    private function listing($request)
+    {
+        \Pager::prepare();
+        javascript('jquery');
+        javascript('jquery_ui');
+        \Layout::addJSHeader("<script type='text/javascript' src='" .
+                PHPWS_SOURCE_HTTP . "mod/always/javascript/Parents/script.js'></script>");
+        \Layout::addStyle('always', 'style.css');
         $parent = new \always\Parents;
         $form = $parent->pullForm();
+        $form->requiredScript();
         $form->appendCSS('bootstrap');
         $form->setAction('/always/admin/parents');
         $form->addHidden('command', 'save');
         $form->addHidden('parent_id', 0);
 
         if (!$parent->getId()) {
-            $username = $form->addEmail('username');
-            $username->setPlaceholder("Enter parent's email address");
+            $form->addEmail('username')->setPlaceholder("Enter parent's email address")->setRequired();
         }
 
         $form->getSingleInput('first_name')->setRequired();
         $form->getSingleInput('last_name')->setRequired();
+
+        $form->addTextField('student_first_name')->setRequired();
+        $form->addTextField('student_last_name')->setRequired();
+
+        $class_date = range(CLASS_DATE_LOW_RANGE, date('Y') + 4, 1);
+        $class_date = array_combine($class_date, $class_date);
+        $form->addSelect('class_date', $class_date)->setLabel('Student class date');
 
         $form->addSubmit('submit', 'Save parent');
         $data = $form->getInputStringArray();
@@ -146,6 +188,29 @@ class Parents extends \Http\Controller {
         $template = new \Template($data);
         $template->setModuleTemplate('always', 'Admin/Parents/List.html');
         return $template;
+    }
+
+    private function pagerData()
+    {
+        $db = \Database::newDB();
+        $parent = $db->addTable('always_parents');
+        $users = $db->addTable('users');
+        $parent->addField('id');
+        $first_name = $parent->addField('first_name');
+        $last_name = $parent->addField('last_name');
+        $username = $users->addField('username');
+        $db->addConditional($db->createConditional($users->getField('id'),
+                        $parent->getField('user_id')));
+        $db->setGroupBy($last_name);
+        $pager = new \DatabasePager($db);
+        $pager->setHeaders(array('last_name', 'first_name', 'username'));
+        $tbl_headers['last_name'] = $last_name;
+        $tbl_headers['first_name'] = $first_name;
+        $tbl_headers['username'] = $username;
+        $pager->setTableHeaders($tbl_headers);
+        $pager->setId('parent-list');
+        $pager->setRowIdColumn('id');
+        return $pager->getJson();
     }
 
     protected function getJsonView($data, \Request $request)
@@ -159,42 +224,47 @@ class Parents extends \Http\Controller {
                 case 'delete_parent':
                     $data = $this->deleteParentJson($request);
                     break;
+
+                case 'pager':
+                    $data = $this->pagerData();
+                    break;
             }
         } else {
-            $db = \Database::newDB();
-            $parent = $db->addTable('always_parents');
-            $users = $db->addTable('users');
-            $parent->addField('id');
-            $first_name = $parent->addField('first_name');
-            $last_name = $parent->addField('last_name');
-            $username = $users->addField('username');
-            $db->addConditional($db->createConditional($users->getField('id'),
-                            $parent->getField('user_id')));
-            $db->setGroupBy($last_name);
-            $pager = new \DatabasePager($db);
-            $pager->setHeaders(array('last_name', 'first_name', 'username'));
-            $tbl_headers['last_name'] = $last_name;
-            $tbl_headers['first_name'] = $first_name;
-            $tbl_headers['username'] = $username;
-            $pager->setTableHeaders($tbl_headers);
-            $pager->setId('parent-list');
-            $pager->setRowIdColumn('id');
-            $data = $pager->getJson();
+            throw new \Exception('JSON command not found');
         }
         return parent::getJsonView($data, $request);
     }
 
     private function deleteParentJson(\Request $request)
     {
-        \always\ParentFactory::deleteParentById($request->getVar('pid'));
+        \always\ParentFactory::deleteParentById($request->getVar('parent_id'));
+    }
+
+    private function getJSONProfileListing($parent_id)
+    {
+        $content = array();
+        $profiles = \always\ProfileFactory::getProfilesByParentId($parent_id);
+        if (empty($profiles)) {
+            return 'No profiles found for this parent';
+        }
+
+        $content[] = '<ul>';
+        foreach ($profiles as $p) {
+            $content[] = '<li><a href="always/admin/parents/edit?parent_id='
+                    . $parent_id . '&amp;original_id=' . $p->getOriginalId() . '">' . $p->getFullName() . ' - Class of '
+                    . $p->getClassDate() . '</a></li>';
+        }
+        $content[] = '</ul>';
+        return implode("\n", $content);
     }
 
     private function editParentJson(\Request $request)
     {
-        $profile = \always\ParentFactory::getParentById($request->getVar('pid'));
-        $data['first_name'] = $profile->getFirstName();
-        $data['last_name'] = $profile->getLastName();
-        $data['username'] = $profile->getUsername();
+        $parent = \always\ParentFactory::getParentById($request->getVar('pid'));
+        $data['first_name'] = $parent->getFirstName();
+        $data['last_name'] = $parent->getLastName();
+        $data['username'] = $parent->getUsername();
+        $data['profile_list'] = $this->getJSONProfileListing($parent->getId());
         return $data;
     }
 

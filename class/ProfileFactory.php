@@ -20,17 +20,56 @@ class ProfileFactory {
         return $profile;
     }
 
+
+    public static function getProfilesByParentId($parent_id, $approved=true)
+    {
+        $db = \Database::newDB();
+        $t1 = $db->addTable('always_profile', 't1');
+        $t2 = $db->buildTable('always_profile', 't2');
+        $c1 = $t1->getFieldConditional('original_id', $t2->getField('original_id'));
+        $c2 = $t1->getFieldConditional('version', $t2->getField('version'), '<');
+        $db->joinResources($t1, $t2, new \Database\Conditional($c1, $c2, 'and'), 'left outer');
+        $t1->addFieldConditional('parent_id', $parent_id);
+        $result = $db->select();
+        if (empty($result)) {
+            return null;
+        }
+
+        foreach  ($result as $row) {
+            $profile = new \always\Profile;
+            $profile->setVars($row);
+            $listing[$profile->getId()] = $profile;
+        }
+        return $listing;
+    }
+
+    public static function getProfileByOriginalId($original_id)
+    {
+        $db = \Database::newDB();
+        $t1 = $db->addTable('always_profile', 't1');
+        $t2 = $db->buildTable('always_profile', 't2');
+        $c1 = $t1->getFieldConditional('original_id', $t2->getField('original_id'));
+        $c2 = $t1->getFieldConditional('version', $t2->getField('version'), '<');
+        $db->joinResources($t1, $t2, new \Database\Conditional($c1, $c2, 'and'), 'left outer');
+        $t1->addFieldConditional('original_id', $original_id);
+        $result = $db->selectOneRow();
+        if (empty($result)) {
+            return null;
+        }
+        $profile = new \always\Profile;
+        $profile->setVars($result);
+        return $profile;
+    }
+
     /**
      * Gets the highest version of the current User's student profile
      *
      * @param integer $user_id
      * @param boolean $approved If true, return only an approved profile
-     * @return \always\Profile
+     * @return array
      */
-    public static function getProfileByUserId($user_id, $approved = true)
+    public static function getProfilesByUserId($user_id, $approved = true)
     {
-        $profile = new Profile;
-
         $db = \Database::newDB();
         $prot = $db->addTable('always_profile');
         $part = $db->addTable('always_parents', null, false);
@@ -43,12 +82,18 @@ class ProfileFactory {
         if ($approved) {
             $db->addConditional($prot->getFieldConditional('approved', 1));
         }
-        $db->setLimit(1);
-        $result = $db->selectOneRow();
+        $result = $db->select();
+
         if (!empty($result)) {
-            $profile->setVars($result);
+            $profile = new Profile;
+            foreach ($result as $row) {
+                $profile->setVars($row);
+                $profile_list[$profile->getId()] = $profile;
+            }
+            return $profile_list;
+        } else {
+            return null;
         }
-        return $profile;
     }
 
     /**
@@ -122,7 +167,7 @@ class ProfileFactory {
             $data['title'] = 'Create a new profile';
         }
         $template = new \Template($data);
-        $template->setModuleTemplate('always', 'Parents/Edit.html');
+        $template->setModuleTemplate('always', 'Profile/Edit.html');
         return $template;
     }
 
@@ -157,7 +202,14 @@ class ProfileFactory {
     public static function saveProfile(\always\Profile $profile)
     {
         $profile->loadPname();
+        if (!$profile->isSaved()) {
+            $save_original = true;
+        }
         \ResourceFactory::saveResource($profile);
+        if ($save_original) {
+            $profile->copyOriginalId();
+            \ResourceFactory::saveResource($profile);
+        }
     }
 
 }

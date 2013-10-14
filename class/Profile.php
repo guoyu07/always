@@ -2,6 +2,8 @@
 
 namespace always;
 
+require_once PHPWS_SOURCE_DIR  . 'mod/always/inc/defines.php';
+
 /**
  *
  * @author Matthew McNaney <mcnaney at gmail dot com>
@@ -84,11 +86,13 @@ class Profile extends \Resource {
      * @var string
      */
     protected $pname;
+    protected $original_id;
 
     public function __construct()
     {
         parent::__construct();
         $this->parent_id = new \Variable\Integer(null, 'parent_id');
+        $this->original_id = new \Variable\Integer(null, 'original_id');
         $this->bg = new \Variable\Integer(null, 'bg');
         $this->first_name = new \Variable\String(null, 'first_name');
         $this->first_name->allowEmpty(false);
@@ -97,7 +101,7 @@ class Profile extends \Resource {
         $this->last_name->allowEmpty(false);
         $this->last_name->setLimit(50);
         $this->class_date = new \Variable\Integer(null, 'class_date');
-        $this->class_date->setRange(1950, date('Y') + 1);
+        $this->class_date->setRange(CLASS_DATE_LOW_RANGE, date('Y') + 4);
         $this->class_date->setInputType('select');
         $this->profile_pic = new \Variable\File(null, 'profile_pic');
         $this->profile_pic->setInputType('file');
@@ -112,6 +116,12 @@ class Profile extends \Resource {
         $this->version = new \Variable\Integer(0, 'version');
         $this->approved = new \Variable\Bool(0, 'approved');
         $this->pname = new \Variable\Attribute(null, 'pname');
+        $this->admin_editor = new \Variable\Integer(0, 'admin_editor');
+    }
+
+    public function getClassDate()
+    {
+        return $this->class_date->get();
     }
 
     public function getData()
@@ -178,6 +188,11 @@ class Profile extends \Resource {
         return $this->last_name->get();
     }
 
+    public function getOriginalId()
+    {
+        return $this->original_id->get();
+    }
+
     public function setFirstName($name)
     {
         $this->first_name->set(ucwords(trim($name)));
@@ -190,7 +205,7 @@ class Profile extends \Resource {
 
     public function getFullName()
     {
-        return $this->first_name  . ' ' . $this->last_name;
+        return $this->first_name . ' ' . $this->last_name;
     }
 
     public function getViewUrl()
@@ -201,6 +216,11 @@ class Profile extends \Resource {
     public function setClassDate($class_date)
     {
         $this->class_date->set($class_date);
+    }
+
+    public function copyOriginalId()
+    {
+        $this->original_id->set($this->id->get());
     }
 
 }

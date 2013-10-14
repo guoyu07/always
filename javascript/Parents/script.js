@@ -21,6 +21,12 @@ function parent() {
         this.initDeleteClick();
     };
 
+    this.initCreateProfileClick = function() {
+        $('#create-new-profile').click(function() {
+            window.location.href = 'always/admin/profile/new/?parent_id=' + $(this).data('parentId');
+        });
+    };
+
     this.initNewClick = function() {
         $('#new-parent').click(function() {
             $this.initDeleteClick();
@@ -32,6 +38,8 @@ function parent() {
             $('#username').val('');
             $('#parent-id').val(0);
             $('.username-group').show();
+            $('#profile-form').show();
+            $('#profiles').hide();
             $('#parent-options').dialog({title: $this.dialog_title});
             $('#parent-options').dialog('open');
         });
@@ -46,8 +54,8 @@ function parent() {
             $('#delete-button').click(function() {
                 $.get('always/admin/parents/', {
                     'command': 'delete_parent',
-                    'pid' : $('#parent-id').val()
-                }, function(){
+                    'parent_id': $('#parent-id').val()
+                }, function() {
                     window.location.reload();
                 }, 'json');
             });
@@ -63,10 +71,15 @@ function parent() {
                 'command': 'edit_parent',
                 'pid': row_id
             }, function(data) {
+                if (data.profile_list !== undefined) {
+                    $('#profile-list').html(data.profile_list);
+                }
                 $this.dialog_title = 'Update parent account';
                 $('#first_name').val(data['first_name']);
                 $('#last_name').val(data['last_name']);
                 $('.username-group').hide();
+                $('#profile-form').hide();
+                $('#profiles').show();
                 $('#parent-id').val(row_id);
                 $('#parent-options').dialog({title: $this.dialog_title});
                 $('#parent-options').dialog('open');

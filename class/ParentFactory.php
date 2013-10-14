@@ -46,6 +46,10 @@ class ParentFactory {
 
         $user = new \PHPWS_User($parent->getUserId());
         $user->kill();
+
+        $db = \Database::newDB();
+        $db->addTable('always_profile')->addFieldConditional('parent_id', $parent->getId());
+        $db->delete();
     }
 
 }

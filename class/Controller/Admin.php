@@ -19,6 +19,8 @@ class Admin extends \Http\Controller {
 
         $controllers = array(
             'parents' => '\always\Controller\Admin\Parents',
+            'profiles' => '\always\Controller\Admin\Profiles',
+            'settings' => '\always\Controller\Admin\Settings'
         );
 
         if (!array_key_exists($cmd, $controllers)) {

@@ -133,6 +133,11 @@ class Parents extends \Resource {
         return $this->getFirstName() . ' ' . $this->getLastName();
     }
 
+    public function incrementVersion()
+    {
+        $this->version++;
+    }
+
 
 }
 
