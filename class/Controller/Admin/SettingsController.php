@@ -7,7 +7,7 @@ namespace always\Controller\Admin;
  * @author Matthew McNaney <mcnaney at gmail dot com>
  * @license http://opensource.org/licenses/lgpl-3.0.html
  */
-class Settings extends \Http\Controller {
+class SettingsController extends \Http\Controller {
 
     public function get(\Request $request)
     {

@@ -156,21 +156,32 @@ class ProfileFactory {
                         ParentFactory::getCurrentParent());
     }
 
-    public static function editProfile(Profile $profile, Parents $parent)
+    public static function editProfile(Profile $profile)
     {
         javascript('jquery');
         \Layout::addJSHeader("<script type='text/javascript' src='" .
                 PHPWS_SOURCE_HTTP . "mod/always/javascript/ckeditor/ckeditor.js'></script>");
         $form = $profile->pullForm();
+        $form->addHidden('profile_id', $profile->getId());
         $form->setEnctype(\Form::enctype_multipart);
         $form->appendCSS('bootstrap');
 
         if (\Current_User::allow('always')) {
+            if (!$profile->isSubmitted()) {
+                if (!$profile->isFirst()) {
+                    throw new \Exception('Admin should not be allowed to edit unsubmitted profile');
+                } else {
+                    $form->addSubmit('save_unpublished', 'Save unpublished');
+                    $form->addSubmit('save_published', 'Save and Publish');
+                }
+            } else {
+                // profile is submitted
 
+            }
+        } else {
+            $form->addSubmit('save_unpublished', 'Save but do not publish');
+            $form->addSubmit('save_published', 'Save and submit for publication');
         }
-        $form->addSubmit('save_profile', 'Save my profile');
-        $form->addSubmit('submit_profile',
-                'Save profile and submit for publication');
         $data = $form->getInputStringArray();
         if ($profile->isSaved()) {
             $data['title'] = 'Profile for ' . $profile->getFullName();

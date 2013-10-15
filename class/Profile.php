@@ -157,6 +157,11 @@ class Profile extends \Resource {
         return $this->parent_id->get();
     }
 
+    public function getPname()
+    {
+        return $this->pname;
+    }
+
     public function setParentId($parent_id)
     {
         $this->parent_id->set((int) $parent_id);

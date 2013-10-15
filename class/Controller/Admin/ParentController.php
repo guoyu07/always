@@ -10,7 +10,7 @@ require_once PHPWS_SOURCE_DIR . 'mod/always/inc/defines.php';
  * @author Matthew McNaney <mcnaney at gmail dot com>
  * @license http://opensource.org/licenses/lgpl-3.0.html
  */
-class Parents extends \Http\Controller {
+class ParentController extends \Http\Controller {
 
     private $menu;
     private $parent;
@@ -122,10 +122,6 @@ class Parents extends \Http\Controller {
             case 'list':
                 $template = $this->listing($request);
                 break;
-
-            case 'edit':
-                $template = $this->editCurrentProfile($request);
-                break;
         }
         $template->add('menu', $this->menu->get());
         return $template;
@@ -134,46 +130,6 @@ class Parents extends \Http\Controller {
     private function loadMenu()
     {
         $this->menu = new \always\Menu('parents');
-    }
-
-    /**
-     * Here is the logic for whether the administrator edits the profile passed
-     * by original id.
-     *
-     * Administrator
-     * --------------
-     * If unapproved, force approval.
-     * If unsubmitted, get the last approved version
-     * If approved or this is the first version, use current profile.
-     *
-     * We allow the first version without getting in the way because the admin
-     * may want to enter some initial information. The admin can then pass it
-     * on to the parent in an unsubmitted state.
-     *
-     */
-    private function editCurrentProfile(\Request $request)
-    {
-        $this->loadParent($request);
-        $original_id = $request->getVar('original_id');
-        $profile = \always\ProfileFactory::getProfileByOriginalId($original_id);
-
-        if (!$profile->isApproved()) {
-            if ($profile->isSubmitted()) {
-                // profile was submitted and is awaiting approval, force view
-                // so admin may approve
-                return \always\ProfileFactory::view($profile);
-            } elseif (!$profile->isFirst()) {
-                // not the first version, not approved and not submitted.
-                // Since this is a work in progress from the parent we pull the
-                // last approved profile
-                $profile = \always\ProfileFactory::getProfileByOriginalId($original_id,
-                                true);
-            }
-        }
-
-        $template = \always\ProfileFactory::editProfile($profile, $this->parent);
-
-        return $template;
     }
 
     private function listing($request)
@@ -274,7 +230,7 @@ class Parents extends \Http\Controller {
 
         $content[] = '<ul style="margin-left:4px;padding-left:0px;list-style-type:none">';
         foreach ($profiles as $p) {
-            $content[] = '<li><a href="always/admin/parents/edit?parent_id='
+            $content[] = '<li><a href="always/admin/profiles/update?parent_id='
                     . $parent_id . '&amp;original_id=' . $p->getOriginalId() . '">' . $p->getFullName() . ' - Class of '
                     . $p->getClassDate() . '</a></li>';
         }
