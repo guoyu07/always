@@ -73,8 +73,11 @@ class Parents extends \Http\Controller {
         if (empty($cmd)) {
             $cmd = 'view';
         }
-
         switch ($cmd) {
+            case 'list':
+                return $this->listing();
+                break;
+
             case 'view':
                 return $this->view();
                 break;
@@ -95,6 +98,11 @@ class Parents extends \Http\Controller {
             // no profile was ever created or it hasn't been approved
             \Server::forward('/always/parent/edit');
         }
+    }
+
+    private function listing()
+    {
+        $profiles = \always\ProfileFactory::getCurrentUserProfiles();
     }
 
 }

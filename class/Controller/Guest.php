@@ -19,8 +19,7 @@ class Guest extends \Http\Controller {
 
     public function getHtmlView($data, \Request $request)
     {
-        $cmd = $request->lastCommand();
-
+        $cmd = $request->shiftCommand();
         if (empty($cmd)) {
             $cmd = 'welcome';
         }
@@ -57,14 +56,6 @@ class Guest extends \Http\Controller {
             $parent = \always\ParentFactory::getCurrentParent();
             if ($parent->id) {
                 $data['parent'] = true;
-                $profile = \always\ProfileFactory::getCurrentUserProfile(false);
-                if ($profile->isSaved()) {
-                    $data['student_address'] = $profile->getViewUrl();
-                    $data['button'] = 'View ' . $profile->getFullName();
-                } else {
-                    $data['student_address'] = 'always/parent/';
-                    $data['button'] = 'Create a new profile';
-                }
             }
         }
         $template = new \Template();
