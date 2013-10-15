@@ -47,10 +47,16 @@ function parent() {
     };
 
     this.initDeleteClick = function() {
+        $('#delete-button').unbind();
         $('#delete-button .confirm').html('Delete parent');
 
         $('#delete-button').click(function() {
             $('.confirm', this).html('Click again to confirm deletion');
+            $(document).click(function(event){
+                if ($(event.target).closest('#delete-button').length == 0) {
+                    $this.initDeleteClick();
+                }
+            });
             $('#delete-button').click(function() {
                 $.get('always/admin/parents/', {
                     'command': 'delete_parent',

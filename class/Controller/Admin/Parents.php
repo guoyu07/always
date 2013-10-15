@@ -137,18 +137,42 @@ class Parents extends \Http\Controller {
     }
 
     /**
+     * Here is the logic for whether the administrator edits the profile passed
+     * by original id.
+     *
      * Administrator
      * --------------
-     * If unapproval, force approval.
-     * If unsubmitted, edit current approved version, flag as admin edited
-     * If no submission waiting, edit current approved version, flag as admin edited
+     * If unapproved, force approval.
+     * If unsubmitted, get the last approved version
+     * If approved or this is the first version, use current profile.
+     *
+     * We allow the first version without getting in the way because the admin
+     * may want to enter some initial information. The admin can then pass it
+     * on to the parent in an unsubmitted state.
      *
      */
     private function editCurrentProfile(\Request $request)
     {
         $this->loadParent($request);
-        $profile = \always\ProfileFactory::getProfileByOriginalId($request->getVar('original_id'));
+        $original_id = $request->getVar('original_id');
+        $profile = \always\ProfileFactory::getProfileByOriginalId($original_id);
+
+        if (!$profile->isApproved()) {
+            if ($profile->isSubmitted()) {
+                // profile was submitted and is awaiting approval, force view
+                // so admin may approve
+                return \always\ProfileFactory::view($profile);
+            } elseif (!$profile->isFirst()) {
+                // not the first version, not approved and not submitted.
+                // Since this is a work in progress from the parent we pull the
+                // last approved profile
+                $profile = \always\ProfileFactory::getProfileByOriginalId($original_id,
+                                true);
+            }
+        }
+
         $template = \always\ProfileFactory::editProfile($profile, $this->parent);
+
         return $template;
     }
 
@@ -248,7 +272,7 @@ class Parents extends \Http\Controller {
             return 'No profiles found for this parent';
         }
 
-        $content[] = '<ul>';
+        $content[] = '<ul style="margin-left:4px;padding-left:0px;list-style-type:none">';
         foreach ($profiles as $p) {
             $content[] = '<li><a href="always/admin/parents/edit?parent_id='
                     . $parent_id . '&amp;original_id=' . $p->getOriginalId() . '">' . $p->getFullName() . ' - Class of '

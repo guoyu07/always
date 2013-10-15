@@ -2,7 +2,7 @@
 
 namespace always;
 
-require_once PHPWS_SOURCE_DIR  . 'mod/always/inc/defines.php';
+require_once PHPWS_SOURCE_DIR . 'mod/always/inc/defines.php';
 
 /**
  *
@@ -14,90 +14,111 @@ class Profile extends \Resource {
     /**
      * Id of Parent this profile is attached to.
      *
-     * @var integer
+     * @var \Variable\Integer
      */
     protected $parent_id;
 
     /**
-     * Reference to Selected BG
-     * @var Variable\String
+     * Original id of first profile in series
+     * @var \Variable\Integer
      */
-    protected $bg;
+    protected $original_id;
 
     /**
-     * The Profile Picture uploaded
-     * @var Variable\String
+     * A version of the first and last name that allows easier pulling of profile
+     * information.
+     * @var \Variable\Attribute
      */
-    protected $profile_pic;
-
-    /**
-     * The Story
-     * @var Variable\String
-     */
-    protected $story;
-
-    /**
-     * The Summary
-     * @var Variable\String
-     */
-    protected $summary;
-
-    /**
-     * Has the story been submitted for approval?
-     * @var Variable\Integer
-     */
-    protected $submitted;
-
-    /**
-     * Incremented version of the profile
-     *
-     * @var integer
-     */
-    protected $version;
-
-    /**
-     * Whether this version has been approved or not
-     *
-     * @var boolean
-     */
-    protected $approved;
-    protected $table = 'always_profile';
+    protected $pname;
 
     /**
      *
-     * @var string
+     * @var \Variable\TextOnly
      */
     protected $first_name;
 
     /**
      *
-     * @var string
+     * @var \Variable\TextOnly
      */
     protected $last_name;
 
     /**
-     * @var Variable\String
+     * Year of graduation
+     * @var \Variable\Integer
      */
     protected $class_date;
 
     /**
-     * A version of the first and last name that allows easier pulling of profile
-     * information.
-     * @var string
+     * The Profile Picture uploaded, this will be replaced eventually once
+     * multiple pictures can be uploaded.
+     * @var Variable\File
      */
-    protected $pname;
-    protected $original_id;
+    protected $profile_pic;
+
+    /**
+     * A short summary of the student. No html.
+     * @var Variable\String
+     */
+    protected $summary;
+
+    /**
+     * The full html text describing the student
+     * @var Variable\TextOnly
+     */
+    protected $story;
+
+    /**
+     * Reference to Selected BG. This functionality is not yet in program.
+     * @var Variable\Integer
+     */
+    protected $bg;
+
+    /**
+     * If true, the parent has submitted an updated profile for approval.
+     * @var Variable\Integer
+     */
+    protected $submitted;
+
+    /**
+     * Incremented version of the profile. Updated after each approved version.
+     *
+     * @var \Variable\Integer
+     */
+    protected $version;
+
+    /**
+     * Whether this version has been approved or not. Can only be approved by
+     * an admin.
+     *
+     * @var \Variable\Bool
+     */
+    protected $approved;
+
+    /**
+     * The name of the last admin to update the profile.
+     * @var \Variable\TextOnly
+     */
+    protected $last_editor;
+
+    /**
+     * Date and time when profile was last updated
+     * @var \Variable\DateTime
+     */
+    protected $last_updated;
+
+    protected $table = 'always_profile';
 
     public function __construct()
     {
         parent::__construct();
         $this->parent_id = new \Variable\Integer(null, 'parent_id');
         $this->original_id = new \Variable\Integer(null, 'original_id');
-        $this->bg = new \Variable\Integer(null, 'bg');
-        $this->first_name = new \Variable\String(null, 'first_name');
+        $this->pname = new \Variable\Attribute(null, 'pname');
+        $this->first_name = new \Variable\TextOnly(null, 'first_name');
         $this->first_name->allowEmpty(false);
         $this->first_name->setLimit(50);
-        $this->last_name = new \Variable\String(null, 'last_name');
+        $this->last_name = new \Variable\TextOnly(null, 'last_name');
         $this->last_name->allowEmpty(false);
         $this->last_name->setLimit(50);
         $this->class_date = new \Variable\Integer(null, 'class_date');
@@ -106,17 +127,19 @@ class Profile extends \Resource {
         $this->profile_pic = new \Variable\File(null, 'profile_pic');
         $this->profile_pic->setInputType('file');
         $this->profile_pic->allowNull();
+        $this->summary = new \Variable\TextOnly(null, 'summary');
+        $this->summary->setInputType('textarea');
+        $this->summary->setColumnType('Text');
         $this->story = new \Variable\String(null, 'story');
         $this->story->setInputType('textarea');
         $this->story->setColumnType('Text');
-        $this->summary = new \Variable\String(null, 'summary');
-        $this->summary->setInputType('textarea');
-        $this->summary->setColumnType('Text');
+        $this->bg = new \Variable\Integer(null, 'bg');
         $this->submitted = new \Variable\Bool(0, 'submitted');
         $this->version = new \Variable\Integer(0, 'version');
         $this->approved = new \Variable\Bool(0, 'approved');
-        $this->pname = new \Variable\Attribute(null, 'pname');
-        $this->admin_editor = new \Variable\Integer(0, 'admin_editor');
+        $this->last_editor = new \Variable\TextOnly(null, 'last_editor');
+        $this->last_editor->setLimit(100);
+        $this->last_updated = new \Variable\Datetime(0, 'last_updated');
     }
 
     public function getClassDate()
@@ -221,6 +244,33 @@ class Profile extends \Resource {
     public function copyOriginalId()
     {
         $this->original_id->set($this->id->get());
+    }
+
+    /**
+     * Returns true if this profile has been approved by an admin.
+     * @return boolean
+     */
+    public function isApproved()
+    {
+        return $this->approved->get();
+    }
+
+    /**
+     * Returns true if this profile has been submitted by parent
+     * @return boolean
+     */
+    public function isSubmitted()
+    {
+        return $this->submitted->get();
+    }
+
+    /**
+     * Returns true if this profile is first one every created.
+     * @return boolean
+     */
+    public function isFirst()
+    {
+        return $this->version->get() == 0;
     }
 
 }

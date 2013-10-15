@@ -20,22 +20,23 @@ class ProfileFactory {
         return $profile;
     }
 
-
-    public static function getProfilesByParentId($parent_id, $approved=true)
+    public static function getProfilesByParentId($parent_id, $approved = true)
     {
         $db = \Database::newDB();
         $t1 = $db->addTable('always_profile', 't1');
         $t2 = $db->buildTable('always_profile', 't2');
-        $c1 = $t1->getFieldConditional('original_id', $t2->getField('original_id'));
+        $c1 = $t1->getFieldConditional('original_id',
+                $t2->getField('original_id'));
         $c2 = $t1->getFieldConditional('version', $t2->getField('version'), '<');
-        $db->joinResources($t1, $t2, new \Database\Conditional($c1, $c2, 'and'), 'left outer');
+        $db->joinResources($t1, $t2, new \Database\Conditional($c1, $c2, 'and'),
+                'left outer');
         $t1->addFieldConditional('parent_id', $parent_id);
         $result = $db->select();
         if (empty($result)) {
             return null;
         }
 
-        foreach  ($result as $row) {
+        foreach ($result as $row) {
             $profile = new \always\Profile;
             $profile->setVars($row);
             $listing[$profile->getId()] = $profile;
@@ -43,15 +44,21 @@ class ProfileFactory {
         return $listing;
     }
 
-    public static function getProfileByOriginalId($original_id)
+    public static function getProfileByOriginalId($original_id, $approved = false)
     {
         $db = \Database::newDB();
         $t1 = $db->addTable('always_profile', 't1');
         $t2 = $db->buildTable('always_profile', 't2');
-        $c1 = $t1->getFieldConditional('original_id', $t2->getField('original_id'));
+        $c1 = $t1->getFieldConditional('original_id',
+                $t2->getField('original_id'));
         $c2 = $t1->getFieldConditional('version', $t2->getField('version'), '<');
-        $db->joinResources($t1, $t2, new \Database\Conditional($c1, $c2, 'and'), 'left outer');
+        $db->joinResources($t1, $t2, new \Database\Conditional($c1, $c2, 'and'),
+                'left outer');
         $t1->addFieldConditional('original_id', $original_id);
+
+        if ($approved) {
+            $t1->addFieldConditional('approved', 1);
+        }
         $result = $db->selectOneRow();
         if (empty($result)) {
             return null;
@@ -157,6 +164,10 @@ class ProfileFactory {
         $form = $profile->pullForm();
         $form->setEnctype(\Form::enctype_multipart);
         $form->appendCSS('bootstrap');
+
+        if (\Current_User::allow('always')) {
+
+        }
         $form->addSubmit('save_profile', 'Save my profile');
         $form->addSubmit('submit_profile',
                 'Save profile and submit for publication');
