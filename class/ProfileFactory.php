@@ -115,16 +115,29 @@ class ProfileFactory {
         return $profile;
     }
 
+    /**
+     * Gets the highest approved version
+     * @param string $name
+     * @return \always\Profile
+     */
     public static function getProfileByName($name)
     {
         $db = \Database::newDB();
-        $prot = $db->addTable('always_profile');
-        $prot->addFieldConditional('pname', $name);
-        $values = $db->selectOneRow();
-        $profile = new \always\Profile;
-        if (!empty($values)) {
-            $profile->setvars($values);
+        $t1 = $db->addTable('always_profile', 't1');
+        $t2 = $db->buildTable('always_profile', 't2');
+        $c1 = $t1->getFieldConditional('original_id',
+                $t2->getField('original_id'));
+        $c2 = $t1->getFieldConditional('version', $t2->getField('version'), '<');
+        $db->joinResources($t1, $t2, new \Database\Conditional($c1, $c2, 'and'),
+                'left outer');
+        $t1->addFieldConditional('pname', $name);
+        $t1->addFieldConditional('approved', 1);
+        $result = $db->selectOneRow();
+        if (empty($result)) {
+            return null;
         }
+        $profile = new \always\Profile;
+        $profile->setVars($result);
         return $profile;
     }
 
@@ -176,7 +189,7 @@ class ProfileFactory {
                 }
             } else {
                 // profile is submitted
-
+                $form->addSubmit('save_published', 'Approve and save');
             }
         } else {
             $form->addSubmit('save_unpublished', 'Save but do not publish');
@@ -223,6 +236,8 @@ class ProfileFactory {
 
     public static function saveProfile(\always\Profile $profile)
     {
+        $save_original = false;
+
         $profile->loadPname();
         if (!$profile->isSaved()) {
             $save_original = true;

@@ -32,6 +32,10 @@ class Guest extends \Http\Controller {
 
             default:
                 $profile = \always\ProfileFactory::getProfileByName($cmd);
+                // Profile not found
+                if (empty($profile)) {
+                    throw new \Http\NotFoundException;
+                }
                 if ($profile->isSaved()) {
                     return \always\ProfileFactory::displayProfile($profile);
                 }

@@ -29,7 +29,12 @@ class ProfileController extends \Http\Controller {
             case 'update':
                 $this->loadProfile($request);
                 $this->postProfile($request);
-                $response = new \Http\SeeOtherResponse(PHPWS_HOME_HTTP . 'always/' . $this->profile->getPname());
+                if ($this->profile->isApproved()) {
+                    $forward_url = \Server::getSiteUrl() . '/always/' . $this->profile->getPname();
+                } else {
+                    $forward_url = \Server::getSiteUrl() . '/always/admin/';
+                }
+                $response = new \Http\TemporaryRedirectResponse($forward_url);
                 break;
         }
 
@@ -38,7 +43,6 @@ class ProfileController extends \Http\Controller {
 
     private function postProfile(\Request $request)
     {
-        var_dump($_POST);
         $this->profile->setFirstName($request->getVar('first_name'));
         $this->profile->setLastName($request->getVar('last_name'));
         $this->profile->setClassDate($request->getVar('class_date'));
@@ -52,8 +56,6 @@ class ProfileController extends \Http\Controller {
             $this->profile->setSubmitted(true);
             $this->profile->setApproved(true);
         }
-        $this->profile->debug();
-        exit();
         \always\ProfileFactory::saveProfile($this->profile);
     }
 
