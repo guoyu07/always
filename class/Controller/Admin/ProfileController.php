@@ -28,6 +28,7 @@ class ProfileController extends \Http\Controller {
         switch ($cmd) {
             case 'update':
                 $this->loadProfile($request);
+                $this->loadParentFromProfile();
                 $this->postProfile($request);
                 if ($this->profile->isApproved()) {
                     $forward_url = \Server::getSiteUrl() . '/always/' . $this->profile->getPname();
@@ -43,20 +44,8 @@ class ProfileController extends \Http\Controller {
 
     private function postProfile(\Request $request)
     {
-        $this->profile->setFirstName($request->getVar('first_name'));
-        $this->profile->setLastName($request->getVar('last_name'));
-        $this->profile->setClassDate($request->getVar('class_date'));
-        $this->profile->setSummary($request->getVar('summary'));
-        $this->profile->setStory($request->getVar('story'));
-
-        if ($request->isVar('save_unpublished')) {
-            $this->profile->setSubmitted(false);
-            $this->profile->setApproved(false);
-        } elseif ($request->isVar('save_published')) {
-            $this->profile->setSubmitted(true);
-            $this->profile->setApproved(true);
-        }
-        \always\ProfileFactory::saveProfile($this->profile);
+        \always\ProfileFactory::post($request, $this->profile, $this->parent);
+        \always\ProfileFactory::save($this->profile);
     }
 
     public function getHtmlView($data, \Request $request)
@@ -80,7 +69,7 @@ class ProfileController extends \Http\Controller {
                 break;
 
             case 'update':
-                $template = $this->editCurrentProfile($request);
+                $template = $this->updateCurrent($request);
                 break;
         }
         $template->add('menu', $this->menu->get());
@@ -94,7 +83,7 @@ class ProfileController extends \Http\Controller {
 
     private function form()
     {
-        return \always\ProfileFactory::editProfile($this->profile);
+        return \always\ProfileFactory::update($this->profile);
     }
 
     private function listing()
@@ -113,6 +102,11 @@ class ProfileController extends \Http\Controller {
         } else {
             $this->profile = new \always\Profile;
         }
+    }
+
+    private function loadParentFromProfile()
+    {
+        $this->parent = \always\ParentFactory::getParentById($this->profile->getParentId());
     }
 
     private function loadParent(\Request $request)
@@ -139,7 +133,7 @@ class ProfileController extends \Http\Controller {
      * on to the parent in an unsubmitted state.
      *
      */
-    private function editCurrentProfile(\Request $request)
+    private function updateCurrent(\Request $request)
     {
         $this->loadParent($request);
         $original_id = $request->getVar('original_id');
@@ -159,7 +153,7 @@ class ProfileController extends \Http\Controller {
             }
         }
 
-        $template = \always\ProfileFactory::editProfile($profile);
+        $template = \always\ProfileFactory::update($profile);
 
         return $template;
     }

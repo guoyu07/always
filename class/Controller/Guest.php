@@ -19,11 +19,13 @@ class Guest extends \Http\Controller {
 
     public function getHtmlView($data, \Request $request)
     {
-        $cmd = $request->shiftCommand();
+        // The last command was stripped and wasn't recognized as a parent
+        // or an admin. In this case, we get lastCommand instead of stripping
+        // another
+        $cmd = $request->lastCommand();
         if (empty($cmd)) {
             $cmd = 'welcome';
         }
-
         switch ($cmd) {
             case 'welcome':
                 return self::welcome();
@@ -36,7 +38,7 @@ class Guest extends \Http\Controller {
                     throw new \Http\NotFoundException;
                 }
                 if ($profile->isSaved()) {
-                    return \always\ProfileFactory::displayProfile($profile);
+                    return \always\ProfileFactory::display($profile);
                 }
 
                 $response = new \Http\NotFoundResponse;

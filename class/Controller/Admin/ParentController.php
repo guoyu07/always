@@ -54,7 +54,7 @@ class ParentController extends \Http\Controller {
         $profile->setClassDate($request->getVar('class_date'));
         $profile->setParentId($this->parent->getId());
 
-        \always\ProfileFactory::saveProfile($profile);
+        \always\ProfileFactory::save($profile);
     }
 
     public function post(\Request $request)
@@ -220,7 +220,7 @@ class ParentController extends \Http\Controller {
         \always\ParentFactory::deleteParentById($request->getVar('parent_id'));
     }
 
-    private function getJSONProfileListing($parent_id)
+    private function getJsonProfileListing($parent_id)
     {
         $content = array();
         $profiles = \always\ProfileFactory::getProfilesByParentId($parent_id);
@@ -240,11 +240,11 @@ class ParentController extends \Http\Controller {
 
     private function editParentJson(\Request $request)
     {
-        $parent = \always\ParentFactory::getParentById($request->getVar('pid'));
+        $parent = \always\ParentFactory::getParentById($request->getVar('parent_id'));
         $data['first_name'] = $parent->getFirstName();
         $data['last_name'] = $parent->getLastName();
         $data['username'] = $parent->getUsername();
-        $data['profile_list'] = $this->getJSONProfileListing($parent->getId());
+        $data['profile_list'] = $this->getJsonProfileListing($parent->getId());
         return $data;
     }
 

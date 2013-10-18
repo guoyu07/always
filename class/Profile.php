@@ -139,6 +139,7 @@ class Profile extends \Resource {
         $this->approved = new \Variable\Bool(0, 'approved');
         $this->last_editor = new \Variable\TextOnly(null, 'last_editor');
         $this->last_editor->setLimit(100);
+        $this->last_editor->allowNull(true);
         $this->last_updated = new \Variable\Datetime(0, 'last_updated');
     }
 
@@ -160,6 +161,21 @@ class Profile extends \Resource {
     public function getPname()
     {
         return $this->pname;
+    }
+
+    public function getProfilePic()
+    {
+        if (empty($this->profile_pic)) {
+            return null;
+        } else {
+            $img = new \Tag\Image($this->profile_pic->get());
+            return $img;
+        }
+    }
+
+    public function getSummary()
+    {
+        return $this->summary;
     }
 
     public function setParentId($parent_id)
@@ -226,6 +242,16 @@ class Profile extends \Resource {
         $this->first_name->set(ucwords(trim($name)));
     }
 
+    public function setLastEditor($editor)
+    {
+        $this->last_editor->set($editor);
+    }
+
+    public function stampLastUpdated()
+    {
+        $this->last_updated->stamp();
+    }
+
     public function setLastName($name)
     {
         $this->last_name->set(ucwords(trim($name)));
@@ -234,6 +260,11 @@ class Profile extends \Resource {
     public function getFullName()
     {
         return $this->first_name . ' ' . $this->last_name;
+    }
+
+    public function getVersion()
+    {
+        return $this->version;
     }
 
     public function getViewUrl()
@@ -276,6 +307,17 @@ class Profile extends \Resource {
     public function isFirst()
     {
         return $this->version->get() == 0;
+    }
+
+    public function cloneProfile()
+    {
+        $this->id->set(0);
+        $this->submitted->set(false);
+        $this->approved->set(false);
+        $this->approved->set(0);
+        $this->last_editor->set(null);
+        $this->last_updated->set(0);
+        $this->version->increase();
     }
 
 }

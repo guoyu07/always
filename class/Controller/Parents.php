@@ -10,9 +10,11 @@ namespace always\Controller;
 class Parents extends \Http\Controller {
 
     private $parent;
+    private $profile;
 
     public function get(\Request $request)
     {
+        $this->loadCurrentParent();
         $data = array();
         $view = $this->getView($data, $request);
         $response = new \Response($view);
@@ -22,43 +24,29 @@ class Parents extends \Http\Controller {
     public function post(\Request $request)
     {
         $this->loadCurrentParent();
-        $id = $request->getVar('id');
-        if ($id) {
-            $profile = \always\ProfileFactory::getProfileById($id);
+        $this->loadProfile($request);
+
+        \always\ProfileFactory::post($request, $this->profile, $this->parent);
+        $this->profile->setApproved(false);
+        if ($request->isVar('save_unpublished')) {
+            $this->profile->setSubmitted(false);
         } else {
-            $profile = new \always\Profile;
+            $this->profile->setSubmitted(true);
         }
 
-        if ($request->isUploadedFile('profile_pic')) {
-            $file = $request->getUploadedFileArray('profile_pic');
-            $image_path = \always\ProfileFactory::saveProfileImage($file,
-                            $this->parent, $profile);
-            $profile->setProfilePic($image_path);
-        }
-
-
-        $profile->setFirstName($request->getVar('first_name'));
-        $profile->setLastName($request->getVar('last_name'));
-        $profile->setClassDate($request->getVar('class_date'));
-        $profile->setSummary($request->getVar('summary'));
-        $profile->setStory($request->getVar('story'));
-        $profile->setParentId($this->parent->getId());
-
-        if ($request->isVar('submit_profile')) {
-            $profile->setSubmitted(true);
-
-            ///// This is a cheat for until we get approval worked out
-            /* @todo Build approval and remove this line */
-            $profile->setApproved(true);
-        } else {
-            $profile->setSubmitted(false);
-        }
-
-        \always\ProfileFactory::saveProfile($profile);
-
-        $link = $profile->getViewUrl();
-        $response = new \Http\SeeOtherResponse($link);
+        \always\ProfileFactory::save($this->profile);
+        $forward_url = \Server::getSiteUrl() . 'always/' . $this->profile->getPname();
+        $response = new \Http\TemporaryRedirectResponse($forward_url);
         return $response;
+    }
+
+    private function loadProfile(\Request $request)
+    {
+        if ($request->isVar('profile_id')) {
+            $this->profile = \always\ProfileFactory::getProfileById($request->getVar('profile_id'));
+        } else {
+            $this->profile = new \always\Profile;
+        }
     }
 
     private function loadCurrentParent()
@@ -82,8 +70,12 @@ class Parents extends \Http\Controller {
                 return $this->view();
                 break;
 
-            case 'edit':
-                return \always\ProfileFactory::editCurrentUserProfile();
+            case 'update':
+                return $this->update($request);
+                break;
+
+            case 'publish':
+                return $this->publish($request);
                 break;
         }
     }
@@ -93,17 +85,52 @@ class Parents extends \Http\Controller {
         $profile = \always\ProfileFactory::getCurrentUserProfile();
 
         if ($profile->isSaved()) {
-            return \always\ProfileFactory::displayProfile($profile);
+            return \always\ProfileFactory::display($profile);
         } else {
             // no profile was ever created or it hasn't been approved
             \Server::forward('/always/parent/edit');
         }
     }
 
+    private function publish(\Request $request)
+    {
+        if (!$request->isVar('profile_id')) {
+            throw new \Exception('Profile id not set');
+        }
+        $profile = \always\ProfileFactory::getProfileById($request->getVar('profile_id'));
+        $profile->setSubmitted(1);
+        \always\ProfileFactory::save($profile);
+
+        $forward_url = \Server::getSiteUrl() . 'always/' . $profile->getPname();
+        $response = new \Http\TemporaryRedirectResponse($forward_url);
+        $response->forward();
+    }
+
+    private function update(\Request $request)
+    {
+        $profile = \always\ProfileFactory::getUnpublishedProfile($request->getVar('original_id'));
+        return \always\ProfileFactory::update($profile);
+    }
+
     private function listing()
     {
+        $data = array();
+        $profiles = \always\ProfileFactory::getProfilesByParentId($this->parent->getId());
+        foreach ($profiles as $pf) {
+            $sub['name'] = $pf->getFullName();
+            $sub['picture'] = $pf->getProfilePic();
+            $sub['summary'] = $pf->getSummary();
+            $sub['original_id'] = $pf->getOriginalId();
+            $sub['profile_id'] = $pf->getId();
+            $sub['publish'] = $pf->isSubmitted();
+            $data['listing'][] = $sub;
+        }
         $profiles = \always\ProfileFactory::getCurrentUserProfiles();
+        $template = new \Template($data);
+        $template->setModuleTemplate('always', 'Parents/ProfileList.html');
+        return $template;
     }
 
 }
+
 ?>

@@ -13,6 +13,9 @@ class ProfileFactory {
     {
         extract(self::getLastVersionDB());
         $t1->addFieldConditional('parent_id', $parent_id);
+        if ($approved) {
+            $t1->addFieldConditional('approved', 1);
+        }
         $result = $db->select();
         if (empty($result)) {
             return null;
@@ -40,7 +43,7 @@ class ProfileFactory {
         $c1 = $t1->getFieldConditional('original_id',
                 $t2->getField('original_id'));
         $c2 = $t1->getFieldConditional('version', $t2->getField('version'), '<');
-        $db->joinResources($t1, $t2, new \Database\Conditional($c1, $c2, 'and'),
+        $db->joinResources($t1, $t2, $db->createConditional($c1, $c2, 'and'),
                 'left outer');
         return array('db' => $db, 't1' => $t1);
     }
@@ -64,9 +67,66 @@ class ProfileFactory {
         }
     }
 
+    /**
+     * Returns an unpublished profile. If none is found, a new one is created
+     * from the preceding.
+     *
+     * @param integer $original_id
+     */
+    public static function getUnpublishedProfile($original_id)
+    {
+        extract(self::getLastVersionDB());
+        $t1->addFieldConditional('original_id', $original_id);
+        $t1->addFieldConditional('approved', 0);
+        $result = $db->selectOneRow();
+        if (empty($result)) {
+            $source_profile = self::getProfileByOriginalId($original_id, true);
+            if (empty($source_profile)) {
+                throw new \Exception('Failed to create a cloned profile for parent');
+            }
+            $source_profile->cloneProfile();
+            ProfileFactory::save($source_profile);
+            return $source_profile;
+        } else {
+            $profile = new \always\Profile;
+            $profile->setVars($result);
+            return $profile;
+        }
+    }
+
+    public static function post(\Request $request, \always\Profile $profile, \always\Parents $parent)
+    {
+        $profile->setFirstName($request->getVar('first_name'));
+        $profile->setLastName($request->getVar('last_name'));
+        $profile->setClassDate($request->getVar('class_date'));
+        $profile->setSummary($request->getVar('summary'));
+        $profile->setStory($request->getVar('story'));
+        $profile->setLastEditor(\Current_User::getDisplayName());
+        $profile->stampLastUpdated();
+        $profile->setParentId($parent->getId());
+
+        /**
+         * This is stub code until multiple images are allowed
+         */
+        if ($request->isUploadedFile('profile_pic')) {
+            $pic = $profile->getProfilePic();
+
+            // deleting old picture for new picture
+            if ($pic) {
+                $directory = $pic->getDirectory();
+                $directory->unlink();
+            }
+
+            $file = $request->getUploadedFileArray('profile_pic');
+            $image_path = \always\ProfileFactory::saveImage($file, $parent);
+            $profile->setProfilePic($image_path);
+        }
+    }
+
     public static function getProfileByOriginalId($original_id, $approved = false)
     {
         extract(self::getLastVersionDB());
+        $t1->addFieldConditional('original_id', $original_id);
         if ($approved) {
             $t1->addFieldConditional('approved', 1);
         }
@@ -145,7 +205,7 @@ class ProfileFactory {
         return $profile;
     }
 
-    public static function displayProfile(Profile $profile)
+    public static function display(Profile $profile)
     {
         $data = $profile->getStringVars();
         $data['full_name'] = $profile->getFullName();
@@ -153,27 +213,14 @@ class ProfileFactory {
         $parent = ParentFactory::getParentById($profile->getParentId());
         if ($parent->getUserId() == \Current_User::getId()) {
             $data['parent'] = true;
-            $data['button'] = 'Update ' . $profile->getFullName();
+            $data['original_id'] = $profile->getOriginalId();
         }
-
-        /*
-          if (!empty($data['profile_pic'])) {
-          $data['profile_pic'] = '<img src="' . $data['profile_pic'] . '" />';
-          }
-         */
-
         $template = new \Template($data);
         $template->setModuleTemplate('always', 'Display.html');
         return $template;
     }
 
-    public static function editCurrentUserProfile()
-    {
-        return self::editProfile(self::getCurrentUserProfile(false),
-                        ParentFactory::getCurrentParent());
-    }
-
-    public static function editProfile(Profile $profile)
+    public static function update(Profile $profile)
     {
         javascript('jquery');
         \Layout::addJSHeader("<script type='text/javascript' src='" .
@@ -216,8 +263,9 @@ class ProfileFactory {
                         str_replace('@', '-at-', $user_name)) . '/';
     }
 
-    public static function saveProfileImage($file, $parent, $profile)
+    public static function saveImage($file, $parent)
     {
+        $name = $error = $tmp_name = null;
         extract($file);
 
         $file_name = preg_replace('/\s/', '-', $name);
@@ -238,16 +286,19 @@ class ProfileFactory {
         return $full_path;
     }
 
-    public static function saveProfile(\always\Profile $profile)
+    public static function save(\always\Profile $profile)
     {
-        $save_original = false;
-
         $profile->loadPname();
         if (!$profile->isSaved()) {
             $save_original = true;
         }
         \ResourceFactory::saveResource($profile);
-        if ($save_original) {
+
+        /**
+         * The first version will be zero. So if getVersion is false, we copy
+         * the id to original id column.
+         */
+        if (!$profile->getVersion()) {
             $profile->copyOriginalId();
             \ResourceFactory::saveResource($profile);
         }

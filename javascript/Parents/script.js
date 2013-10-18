@@ -52,7 +52,7 @@ function parent() {
 
         $('#delete-button').click(function() {
             $('.confirm', this).html('Click again to confirm deletion');
-            $(document).click(function(event){
+            $(document).click(function(event) {
                 if ($(event.target).closest('#delete-button').length == 0) {
                     $this.initDeleteClick();
                 }
@@ -75,8 +75,11 @@ function parent() {
             var row_id = $(this).data('rowId');
             $.get('always/admin/parents/', {
                 'command': 'edit_parent',
-                'pid': row_id
+                'parent_id': row_id
             }, function(data) {
+                if (data.error !== undefined) {
+                    $('body').append('<table>' + data.error.exception.xdebug_message + '</table>');
+                }
                 if (data.profile_list !== undefined) {
                     $('#profile-list').html(data.profile_list);
                 }
