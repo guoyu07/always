@@ -31,6 +31,10 @@ class Guest extends \Http\Controller {
                 return self::welcome();
                 break;
 
+            case 'list':
+                return $this->listing();
+                break;
+
             default:
                 $profile = \always\Factory\ProfileFactory::getProfileByName($cmd);
 
@@ -56,6 +60,15 @@ class Guest extends \Http\Controller {
                 $response = new \Http\NotFoundResponse;
                 return new \View\HtmlErrorView($request, $response);
         }
+    }
+
+    private function listing()
+    {
+        $profiles = \always\Factory\ProfileFactory::getApprovedNameList();
+        $template = new \Template();
+        $template->setModuleTemplate('always', 'Guest/List.html');
+        $template->addVariables($data);
+        return $template;
     }
 
     /**

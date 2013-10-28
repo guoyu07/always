@@ -17,6 +17,7 @@ class ProfileFactory {
      */
     public static function getProfilesByParentId($parent_id, $approved = null)
     {
+        $db = $t1 = null;
         extract(self::getLastVersionDB());
         $t1->addFieldConditional('parent_id', $parent_id);
         if (isset($approved)) {
@@ -51,11 +52,13 @@ class ProfileFactory {
         $db->joinResources($t1, $t2, $db->createConditional($c1, $c2, 'and'),
                 'left outer');
         $t2->addFieldConditional('id', null, 'is');
+        $db->setGroupBy($t1->getField('id'));
         return array('db' => $db, 't1' => $t1);
     }
 
     public static function getCurrentUserProfiles()
     {
+        $db = $t1 = null;
         extract(self::getLastVersionDB());
         $t3 = $db->addTable('always_parents', null, false);
         $t1->addFieldConditional('parent_id', $t3->getField('id'));
@@ -81,6 +84,7 @@ class ProfileFactory {
      */
     public static function getUnpublishedProfile($original_id)
     {
+        $db = $t1 = null;
         extract(self::getLastVersionDB());
         $t1->addFieldConditional('original_id', $original_id);
         $t1->addFieldConditional('approved', 0);
@@ -124,13 +128,15 @@ class ProfileFactory {
             }
 
             $file = $request->getUploadedFileArray('profile_pic');
-            $image_path = \always\Factory\ProfileFactory::saveImage($file, $parent);
+            $image_path = \always\Factory\ProfileFactory::saveImage($file,
+                            $parent);
             $profile->setProfilePic($image_path);
         }
     }
 
     public static function getProfileByOriginalId($original_id, $approved = null)
     {
+        $db = $t1 = null;
         extract(self::getLastVersionDB());
         $t1->addFieldConditional('original_id', $original_id);
         if (isset($approved)) {
@@ -154,22 +160,19 @@ class ProfileFactory {
      */
     public static function getProfilesByUserId($user_id, $approved = null)
     {
-        $db = \Database::newDB();
-        $prot = $db->addTable('always_profile');
-        $part = $db->addTable('always_parents', null, false);
-
-        $prot->addOrderBy($prot->getField('version'), 'desc');
-
-        $db->addConditional($part->getFieldConditional('user_id', $user_id));
-        $db->addConditional($db->createConditional($part->getField('id'),
-                        $prot->getField('parent_id')));
+        $db = $t1 = null;
+        extract(self::getLastVersionDB());
+        $t3 = $db->addTable('always_parents', null, false);
+        $t1->addFieldConditional('parent_id', $t3->getField('id'));
+        $t3->addFieldConditional('user_id', $user_id);
         if (isset($approved)) {
             $t1->addFieldConditional('approved', (int) (bool) $approved);
         }
+        echo $db->selectQuery();
         $result = $db->select();
 
         if (!empty($result)) {
-            $profile = new Profile;
+            $profile = new \always\Resource\Profile;
             foreach ($result as $row) {
                 $profile->setVars($row);
                 $profile_list[$profile->getId()] = $profile;
@@ -187,7 +190,7 @@ class ProfileFactory {
      */
     public static function getProfileById($id)
     {
-        $profile = new Profile;
+        $profile = new \always\Resource\Profile;
         \ResourceFactory::loadById($profile, $id);
         return $profile;
     }
@@ -196,9 +199,10 @@ class ProfileFactory {
     {
         $db = \Database::newDB();
         $t1 = $db->addTable('always_profile');
-        $t1->addFieldConditional('pname', $name);
         $t1->addFieldConditional('approved', 1);
         $t1->addOrderBy($t1->getField('version'), 'desc');
+
+        $t1->addFieldConditional('pname', $name);
         $result = $db->selectOneRow();
         if (empty($result)) {
             return null;
@@ -315,7 +319,7 @@ class ProfileFactory {
         if ($profile->isSaved()) {
             $data['title'] = 'Profile for ' . $profile->getFullName();
         } else {
-            $data['title'] = 'Create a new profile';
+            $data['title'] = 'Create a new \always\Resource\Profile';
         }
         $template = new \Template($data);
         $template->setModuleTemplate('always', 'Profile/Edit.html');
@@ -367,6 +371,11 @@ class ProfileFactory {
             $profile->copyOriginalId();
             \ResourceFactory::saveResource($profile);
         }
+    }
+
+    public static function getApprovedNameList()
+    {
+
     }
 
 }
