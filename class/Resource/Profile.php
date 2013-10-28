@@ -1,6 +1,6 @@
 <?php
 
-namespace always;
+namespace always\Resource;
 
 require_once PHPWS_SOURCE_DIR . 'mod/always/inc/defines.php';
 
@@ -165,7 +165,7 @@ class Profile extends \Resource {
 
     public function getProfilePic()
     {
-        if (empty($this->profile_pic)) {
+        if ($this->profile_pic->isEmpty()) {
             return null;
         } else {
             $img = new \Tag\Image($this->profile_pic->get());
@@ -269,7 +269,7 @@ class Profile extends \Resource {
 
     public function getViewUrl()
     {
-        return \Server::getSiteUrl() . "/always/$this->pname";
+        return \Server::getSiteUrl() . "always/$this->pname";
     }
 
     public function setClassDate($class_date)

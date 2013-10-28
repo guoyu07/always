@@ -26,7 +26,7 @@ class Parents extends \Http\Controller {
         $this->loadCurrentParent();
         $this->loadProfile($request);
 
-        \always\ProfileFactory::post($request, $this->profile, $this->parent);
+        \always\Factory\ProfileFactory::post($request, $this->profile, $this->parent);
         $this->profile->setApproved(false);
         if ($request->isVar('save_unpublished')) {
             $this->profile->setSubmitted(false);
@@ -34,7 +34,7 @@ class Parents extends \Http\Controller {
             $this->profile->setSubmitted(true);
         }
 
-        \always\ProfileFactory::save($this->profile);
+        \always\Factory\ProfileFactory::save($this->profile);
         $forward_url = \Server::getSiteUrl() . 'always/' . $this->profile->getPname();
         $response = new \Http\TemporaryRedirectResponse($forward_url);
         return $response;
@@ -43,15 +43,15 @@ class Parents extends \Http\Controller {
     private function loadProfile(\Request $request)
     {
         if ($request->isVar('profile_id')) {
-            $this->profile = \always\ProfileFactory::getProfileById($request->getVar('profile_id'));
+            $this->profile = \always\Factory\ProfileFactory::getProfileById($request->getVar('profile_id'));
         } else {
-            $this->profile = new \always\Profile;
+            $this->profile = new \always\Resource\Profile;
         }
     }
 
     private function loadCurrentParent()
     {
-        $this->parent = \always\ParentFactory::getCurrentParent();
+        $this->parent = \always\Factory\ParentFactory::getCurrentParent();
     }
 
     public function getHtmlView($data, \Request $request)
@@ -82,10 +82,10 @@ class Parents extends \Http\Controller {
 
     private function view()
     {
-        $profile = \always\ProfileFactory::getCurrentUserProfile();
+        $profile = \always\Factory\ProfileFactory::getCurrentUserProfile();
 
         if ($profile->isSaved()) {
-            return \always\ProfileFactory::display($profile);
+            return \always\Factory\ProfileFactory::display($profile);
         } else {
             // no profile was ever created or it hasn't been approved
             \Server::forward('/always/parent/edit');
@@ -97,9 +97,10 @@ class Parents extends \Http\Controller {
         if (!$request->isVar('profile_id')) {
             throw new \Exception('Profile id not set');
         }
-        $profile = \always\ProfileFactory::getProfileById($request->getVar('profile_id'));
+
+        $profile = \always\Factory\ProfileFactory::getProfileById($request->getVar('profile_id'));
         $profile->setSubmitted(1);
-        \always\ProfileFactory::save($profile);
+        \always\Factory\ProfileFactory::save($profile);
 
         $forward_url = \Server::getSiteUrl() . 'always/' . $profile->getPname();
         $response = new \Http\TemporaryRedirectResponse($forward_url);
@@ -108,24 +109,25 @@ class Parents extends \Http\Controller {
 
     private function update(\Request $request)
     {
-        $profile = \always\ProfileFactory::getUnpublishedProfile($request->getVar('original_id'));
-        return \always\ProfileFactory::update($profile);
+        $profile = \always\Factory\ProfileFactory::getUnpublishedProfile($request->getVar('original_id'));
+        return \always\Factory\ProfileFactory::update($profile);
     }
 
     private function listing()
     {
         $data = array();
-        $profiles = \always\ProfileFactory::getProfilesByParentId($this->parent->getId());
+        $profiles = \always\Factory\ProfileFactory::getProfilesByParentId($this->parent->getId());
         foreach ($profiles as $pf) {
             $sub['name'] = $pf->getFullName();
             $sub['picture'] = $pf->getProfilePic();
             $sub['summary'] = $pf->getSummary();
             $sub['original_id'] = $pf->getOriginalId();
             $sub['profile_id'] = $pf->getId();
-            $sub['publish'] = $pf->isSubmitted();
+            $sub['publish'] = !$pf->isSubmitted();
             $data['listing'][] = $sub;
         }
-        $profiles = \always\ProfileFactory::getCurrentUserProfiles();
+
+        $profiles = \always\Factory\ProfileFactory::getCurrentUserProfiles();
         $template = new \Template($data);
         $template->setModuleTemplate('always', 'Parents/ProfileList.html');
         return $template;

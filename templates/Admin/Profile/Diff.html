@@ -1,0 +1,27 @@
+<div class="approve-buttons">
+    <a style="margin-bottom: 5px" class="btn btn-default btn-success" href="always/admin/profiles/approve?profile_id=<?=$profile_id?>">Approve</a>
+    <a class="btn btn-default" href="always/admin/profiles/view?profile_id=<?=$profile_id;?>">View</a>
+</div>
+
+<div class="difference">
+    <div>
+        <h3>First name: <?= $first_name_diff ?></h3>
+        <div class="compare"><?= $first_name ?></div>
+    </div>
+    <div>
+        <h3>Last name: <?= $last_name_diff ?></h3>
+        <div class="compare"><?= $last_name ?></div>
+    </div>
+    <div>
+        <h3>Class date: <?= $class_date_diff ?></h3>
+        <div class="compare"><?= $class_date ?></div>
+    </div>
+    <div>
+        <h3>Summary: <?= $summary_diff ?></h3>
+        <div class="compare"><?= $summary ?></div>
+    </div>
+    <div>
+        <h3>Story: <?= $story_diff ?></h3>
+        <div class="compare"><?= $story ?></div>
+    </div>
+</div>

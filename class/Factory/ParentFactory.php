@@ -1,6 +1,6 @@
 <?php
 
-namespace always;
+namespace always\Factory;
 
 /**
  *
@@ -16,7 +16,7 @@ class ParentFactory {
 
     public static function getParentById($id)
     {
-        $parent = new \always\Parents;
+        $parent = new \always\Resource\Parents;
         if ($id) {
             \ResourceFactory::loadById($parent, $id);
         }
@@ -26,7 +26,7 @@ class ParentFactory {
 
     public static function getParentByUserId($user_id)
     {
-        $parent = new \always\Parents;
+        $parent = new \always\Resource\Parents;
         $db = \Database::newDB();
         $ap = $db->addTable('always_parents');
         $ap->addFieldConditional('user_id', \Current_User::getId());

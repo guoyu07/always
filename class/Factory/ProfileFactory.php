@@ -1,6 +1,6 @@
 <?php
 
-namespace always;
+namespace always\Factory;
 
 /**
  *
@@ -9,20 +9,25 @@ namespace always;
  */
 class ProfileFactory {
 
-    public static function getProfilesByParentId($parent_id, $approved = true)
+    /**
+     *
+     * @param type $parent_id
+     * @param bool $approved If null, pull all profiles. True, only approved. False, only unapproved
+     * @return null|\always\Resource\Profile
+     */
+    public static function getProfilesByParentId($parent_id, $approved = null)
     {
         extract(self::getLastVersionDB());
         $t1->addFieldConditional('parent_id', $parent_id);
-        if ($approved) {
-            $t1->addFieldConditional('approved', 1);
+        if (isset($approved)) {
+            $t1->addFieldConditional('approved', (int) (bool) $approved);
         }
         $result = $db->select();
         if (empty($result)) {
             return null;
         }
-
         foreach ($result as $row) {
-            $profile = new \always\Profile;
+            $profile = new \always\Resource\Profile;
             $profile->setVars($row);
             $listing[$profile->getId()] = $profile;
         }
@@ -35,7 +40,7 @@ class ProfileFactory {
      * $t1 = Database\Table object using always profile
      * @return array
      */
-    private static function getLastVersionDB()
+    public static function getLastVersionDB()
     {
         $db = \Database::newDB();
         $t1 = $db->addTable('always_profile', 't1');
@@ -45,6 +50,7 @@ class ProfileFactory {
         $c2 = $t1->getFieldConditional('version', $t2->getField('version'), '<');
         $db->joinResources($t1, $t2, $db->createConditional($c1, $c2, 'and'),
                 'left outer');
+        $t2->addFieldConditional('id', null, 'is');
         return array('db' => $db, 't1' => $t1);
     }
 
@@ -57,7 +63,7 @@ class ProfileFactory {
         $result = $db->select();
         if (!empty($result)) {
             foreach ($result as $row) {
-                $profile = new \always\Profile;
+                $profile = new \always\Resource\Profile;
                 $profile->setVars($row);
                 $prows[] = $profile;
             }
@@ -88,13 +94,13 @@ class ProfileFactory {
             ProfileFactory::save($source_profile);
             return $source_profile;
         } else {
-            $profile = new \always\Profile;
+            $profile = new \always\Resource\Profile;
             $profile->setVars($result);
             return $profile;
         }
     }
 
-    public static function post(\Request $request, \always\Profile $profile, \always\Parents $parent)
+    public static function post(\Request $request, \always\Resource\Profile $profile, \always\Resource\Parents $parent)
     {
         $profile->setFirstName($request->getVar('first_name'));
         $profile->setLastName($request->getVar('last_name'));
@@ -118,23 +124,23 @@ class ProfileFactory {
             }
 
             $file = $request->getUploadedFileArray('profile_pic');
-            $image_path = \always\ProfileFactory::saveImage($file, $parent);
+            $image_path = \always\Factory\ProfileFactory::saveImage($file, $parent);
             $profile->setProfilePic($image_path);
         }
     }
 
-    public static function getProfileByOriginalId($original_id, $approved = false)
+    public static function getProfileByOriginalId($original_id, $approved = null)
     {
         extract(self::getLastVersionDB());
         $t1->addFieldConditional('original_id', $original_id);
-        if ($approved) {
-            $t1->addFieldConditional('approved', 1);
+        if (isset($approved)) {
+            $t1->addFieldConditional('approved', (int) (bool) $approved);
         }
         $result = $db->selectOneRow();
         if (empty($result)) {
             return null;
         }
-        $profile = new \always\Profile;
+        $profile = new \always\Resource\Profile;
         $profile->setVars($result);
         return $profile;
     }
@@ -146,7 +152,7 @@ class ProfileFactory {
      * @param boolean $approved If true, return only an approved profile
      * @return array
      */
-    public static function getProfilesByUserId($user_id, $approved = true)
+    public static function getProfilesByUserId($user_id, $approved = null)
     {
         $db = \Database::newDB();
         $prot = $db->addTable('always_profile');
@@ -157,8 +163,8 @@ class ProfileFactory {
         $db->addConditional($part->getFieldConditional('user_id', $user_id));
         $db->addConditional($db->createConditional($part->getField('id'),
                         $prot->getField('parent_id')));
-        if ($approved) {
-            $db->addConditional($prot->getFieldConditional('approved', 1));
+        if (isset($approved)) {
+            $t1->addFieldConditional('approved', (int) (bool) $approved);
         }
         $result = $db->select();
 
@@ -177,7 +183,7 @@ class ProfileFactory {
     /**
      *
      * @param integer $id
-     * @return \always\Profile
+     * @return \always\Resource\Profile
      */
     public static function getProfileById($id)
     {
@@ -186,41 +192,100 @@ class ProfileFactory {
         return $profile;
     }
 
-    /**
-     * Gets the highest approved version
-     * @param string $name
-     * @return \always\Profile
-     */
-    public static function getProfileByName($name)
+    public static function getLastApprovedByName($name)
     {
-        extract(self::getLastVersionDB());
+        $db = \Database::newDB();
+        $t1 = $db->addTable('always_profile');
         $t1->addFieldConditional('pname', $name);
         $t1->addFieldConditional('approved', 1);
+        $t1->addOrderBy($t1->getField('version'), 'desc');
         $result = $db->selectOneRow();
         if (empty($result)) {
             return null;
         }
-        $profile = new \always\Profile;
+        $profile = new \always\Resource\Profile;
         $profile->setVars($result);
         return $profile;
     }
 
-    public static function display(Profile $profile)
+    /**
+     * Gets the highest version of profiles by pname. Note that if approved is
+     * true and the last version is not approved, nothing will be returned.
+     * @param string $name
+     * @return \always\Resource\Profile
+     */
+    public static function getProfileByName($name, $approved = null)
+    {
+        extract(self::getLastVersionDB());
+        $t1->addFieldConditional('pname', $name);
+        if (isset($approved)) {
+            $t1->addFieldConditional('approved', (int) (bool) $approved);
+        }
+        $result = $db->selectOneRow();
+        if (empty($result)) {
+            return null;
+        }
+        $profile = new \always\Resource\Profile;
+        $profile->setVars($result);
+        return $profile;
+    }
+
+    public static function diff(Profile $old_profile, Profile $new_profile)
+    {
+        require_once PHPWS_SOURCE_DIR . 'mod/always/inc/HtmlDiff.php';
+        $ovars = $old_profile->getStringVars();
+        $nvars = $new_profile->getStringVars();
+
+        foreach ($ovars as $key => $value) {
+            $key_diff = $key . '_diff';
+            if ($nvars[$key] == $value) {
+                $compare = $value;
+                $tpl[$key_diff] = '<span class="no-changes">No changes</span>';
+            } else {
+                $tpl[$key_diff] = '<span class="changed">Changed</span>';
+                $diff = new \HtmlDiff($value, $nvars[$key]);
+                $compare = $diff->build();
+            }
+            $tpl[$key] = $compare;
+        }
+        return $tpl;
+    }
+
+    public static function display(\always\Resource\Profile $profile)
     {
         $data = $profile->getStringVars();
         $data['full_name'] = $profile->getFullName();
+        $data['approve'] = false;
+        $data['publish'] = false;
+        $data['admin'] = false;
+        $data['parent_update'] = false;
+        $data['profile_id'] = $profile->getId();
+        $data['original_id'] = $profile->getOriginalId();
 
         $parent = ParentFactory::getParentById($profile->getParentId());
         if ($parent->getUserId() == \Current_User::getId()) {
-            $data['parent'] = true;
-            $data['original_id'] = $profile->getOriginalId();
+            $data['parent_update'] = true;
+            $data['admin'] = true;
+            if (!$profile->isApproved()) {
+                if ($profile->isSubmitted()) {
+                    $data['status'] = 'Awaiting approval. You may continue to update it.';
+                } else {
+                    $data['publish'] = true;
+                    $data['status'] = 'Unsubmitted. Click Publish to submit for approval';
+                }
+            }
+        } elseif (\Current_User::allow('always')) {
+            $data['admin'] = true;
+            if (!$profile->isApproved() && $profile->isSubmitted()) {
+                $data['approve'] = true;
+            }
         }
         $template = new \Template($data);
         $template->setModuleTemplate('always', 'Display.html');
         return $template;
     }
 
-    public static function update(Profile $profile)
+    public static function update(\always\Resource\Profile $profile)
     {
         javascript('jquery');
         \Layout::addJSHeader("<script type='text/javascript' src='" .
@@ -240,7 +305,7 @@ class ProfileFactory {
                 }
             } else {
                 // profile is submitted
-                $form->addSubmit('save_published', 'Approve and save');
+                $form->addSubmit('save_published', 'Update');
             }
         } else {
             $form->addSubmit('save_unpublished', 'Save but do not publish');
@@ -286,7 +351,7 @@ class ProfileFactory {
         return $full_path;
     }
 
-    public static function save(\always\Profile $profile)
+    public static function save(\always\Resource\Profile $profile)
     {
         $profile->loadPname();
         if (!$profile->isSaved()) {

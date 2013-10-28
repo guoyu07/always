@@ -32,9 +32,9 @@ class ParentController extends \Http\Controller {
     {
         $parent_id = $request->getVar('parent_id');
         if ($parent_id) {
-            $this->parent = \always\ParentFactory::getParentById($parent_id);
+            $this->parent = \always\Factory\ParentFactory::getParentById($parent_id);
         } else {
-            $this->parent = new \always\Parents;
+            $this->parent = new \always\Resource\Parents;
         }
     }
 
@@ -48,13 +48,13 @@ class ParentController extends \Http\Controller {
         }
         \ResourceFactory::saveResource($this->parent);
 
-        $profile = new \always\Profile;
+        $profile = new \always\Resource\Profile;
         $profile->setFirstName($request->getVar('student_first_name'));
         $profile->setLastName($request->getVar('student_last_name'));
         $profile->setClassDate($request->getVar('class_date'));
         $profile->setParentId($this->parent->getId());
 
-        \always\ProfileFactory::save($profile);
+        \always\Factory\ProfileFactory::save($profile);
     }
 
     public function post(\Request $request)
@@ -140,7 +140,7 @@ class ParentController extends \Http\Controller {
         \Layout::addJSHeader("<script type='text/javascript' src='" .
                 PHPWS_SOURCE_HTTP . "mod/always/javascript/Parents/script.js'></script>");
         \Layout::addStyle('always', 'style.css');
-        $parent = new \always\Parents;
+        $parent = new \always\Resource\Parents;
         $form = $parent->pullForm();
         $form->requiredScript();
         $form->appendCSS('bootstrap');
@@ -217,13 +217,13 @@ class ParentController extends \Http\Controller {
 
     private function deleteParentJson(\Request $request)
     {
-        \always\ParentFactory::deleteParentById($request->getVar('parent_id'));
+        \always\Factory\ParentFactory::deleteParentById($request->getVar('parent_id'));
     }
 
     private function getJsonProfileListing($parent_id)
     {
         $content = array();
-        $profiles = \always\ProfileFactory::getProfilesByParentId($parent_id);
+        $profiles = \always\Factory\ProfileFactory::getProfilesByParentId($parent_id);
         if (empty($profiles)) {
             return 'No profiles found for this parent';
         }
@@ -240,7 +240,7 @@ class ParentController extends \Http\Controller {
 
     private function editParentJson(\Request $request)
     {
-        $parent = \always\ParentFactory::getParentById($request->getVar('parent_id'));
+        $parent = \always\Factory\ParentFactory::getParentById($request->getVar('parent_id'));
         $data['first_name'] = $parent->getFirstName();
         $data['last_name'] = $parent->getLastName();
         $data['username'] = $parent->getUsername();

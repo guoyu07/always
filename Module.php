@@ -34,6 +34,7 @@ class Module extends \Module {
 
     public function runTime(\Request $request)
     {
+        \Layout::addStyle('always');
         $module = $request->getModule();
         if (empty($module)) {
             $template = Controller\Guest::welcome();

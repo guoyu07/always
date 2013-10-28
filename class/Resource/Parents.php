@@ -1,6 +1,6 @@
 <?php
 
-namespace always;
+namespace always\Resource;
 
 /**
  *

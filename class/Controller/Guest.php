@@ -32,13 +32,25 @@ class Guest extends \Http\Controller {
                 break;
 
             default:
-                $profile = \always\ProfileFactory::getProfileByName($cmd);
+                $profile = \always\Factory\ProfileFactory::getProfileByName($cmd);
+
                 // Profile not found
                 if (empty($profile)) {
                     throw new \Http\NotFoundException;
                 }
-                if ($profile->isSaved()) {
-                    return \always\ProfileFactory::display($profile);
+
+                $parent = \always\Factory\ParentFactory::getParentById($profile->getParentId());
+                if ($profile->isApproved() || $parent->getUserId() == \Current_User::getId() || \Current_User::allow('always')) {
+                    return \always\Factory\ProfileFactory::display($profile);
+                } else {
+                    $profile = \always\Factory\ProfileFactory::getLastApprovedByName($cmd);
+                    if (empty($profile)) {
+                        $tpl['message'] = 'Sorry, but there isn\'t a student profile available at this address.';
+                        $template = new \Template($tpl);
+                        $template->setModuleTemplate('always', 'Error.html');
+                        return $template;
+                    }
+                    return \always\Factory\ProfileFactory::display($profile);
                 }
 
                 $response = new \Http\NotFoundResponse;
@@ -55,7 +67,7 @@ class Guest extends \Http\Controller {
         $data = array();
         $data['parent'] = false;
         if (\Current_User::isLogged()) {
-            $parent = \always\ParentFactory::getCurrentParent();
+            $parent = \always\Factory\ParentFactory::getCurrentParent();
             if ($parent->id) {
                 $data['parent'] = true;
             }
