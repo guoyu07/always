@@ -19,21 +19,38 @@ class Guest extends \Http\Controller {
 
     public function getHtmlView($data, \Request $request)
     {
+        // The last command was stripped and wasn't recognized as a parent
+        // or an admin. In this case, we get lastCommand instead of stripping
+        // another
         $cmd = $request->lastCommand();
-
         if (empty($cmd)) {
             $cmd = 'welcome';
         }
-
         switch ($cmd) {
             case 'welcome':
                 return self::welcome();
                 break;
 
             default:
-                $profile = \always\ProfileFactory::getProfileByName($cmd);
-                if ($profile->isSaved()) {
-                    return \always\ProfileFactory::displayProfile($profile);
+                $profile = \always\Factory\ProfileFactory::getProfileByName($cmd);
+
+                // Profile not found
+                if (empty($profile)) {
+                    throw new \Http\NotFoundException;
+                }
+
+                $parent = \always\Factory\ParentFactory::getParentById($profile->getParentId());
+                if ($profile->isApproved() || $parent->getUserId() == \Current_User::getId() || \Current_User::allow('always')) {
+                    return \always\Factory\ProfileFactory::display($profile);
+                } else {
+                    $profile = \always\Factory\ProfileFactory::getLastApprovedByName($cmd);
+                    if (empty($profile)) {
+                        $tpl['message'] = 'Sorry, but there isn\'t a student profile available at this address.';
+                        $template = new \Template($tpl);
+                        $template->setModuleTemplate('always', 'Error.html');
+                        return $template;
+                    }
+                    return \always\Factory\ProfileFactory::display($profile);
                 }
 
                 $response = new \Http\NotFoundResponse;
@@ -50,16 +67,9 @@ class Guest extends \Http\Controller {
         $data = array();
         $data['parent'] = false;
         if (\Current_User::isLogged()) {
-            $parent = \always\ParentFactory::getCurrentParent();
+            $parent = \always\Factory\ParentFactory::getCurrentParent();
             if ($parent->id) {
                 $data['parent'] = true;
-                $profile = \always\ProfileFactory::getCurrentUserProfile(false);
-                if ($profile->isSaved()) {
-                    $data['student_address'] = $profile->getViewUrl();
-                    $data['button'] = 'View ' . $profile->getFullName();
-                } else {
-                    $data['button'] = 'Create a new profile';
-                }
             }
         }
         $template = new \Template();

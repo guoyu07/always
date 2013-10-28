@@ -1,0 +1,48 @@
+.difference {
+    padding : 1em;
+    background-color : white;
+}
+
+del.diffmod,
+ins.diffins {
+    color : white;
+    border-radius: 3px;
+    text-decoration : none;
+}
+
+del.diffmod {
+    background-color : red;
+    border : 1px solid red;
+    text-decoration : line-through;
+}
+
+ins.diffins {
+    background-color : green;
+    border : 1px solid green;
+}
+
+div.compare {
+    padding : 1em;
+    border : 1px solid black;
+}
+
+.no-changes {
+    color : #6d6d6d;
+}
+
+.approve-buttons {
+    border:1px solid black;
+    padding:1em;
+    text-align:center;
+    width:130px;
+    height : 100px;
+    background-color : white;
+    position : fixed;
+    z-index:100;
+    right : 10px;
+    top : 50px;
+}
+
+.approve-buttons .btn {
+    width : 100px;
+}

@@ -22,7 +22,7 @@ class Module extends \Module {
         if ($cmd == 'admin' && \Current_User::allow('always')) {
             $admin = new \always\Controller\Admin($this);
             $controller = $admin->getController($request);
-        } elseif ($cmd == 'parent') {
+        } elseif ($cmd == 'parent' && \Current_User::isLogged()) {
             $parents = new \always\Controller\Parents($this);
             return $parents;
         } else {
@@ -34,6 +34,7 @@ class Module extends \Module {
 
     public function runTime(\Request $request)
     {
+        \Layout::addStyle('always');
         $module = $request->getModule();
         if (empty($module)) {
             $template = Controller\Guest::welcome();

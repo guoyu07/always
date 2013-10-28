@@ -1,4 +1,5 @@
-<div class="pager-listing bg-tl" id="parent-list" data-rpp="10">
+<div class="pager-listing" id="parent-list" data-rpp="10" data-pager-url="always/admin/parents/?command=pager">
+    <?=$menu?>
     <div class="row">
         <div class="col-lg-3">
             <button class="btn btn-primary" style="margin:10px;" id="new-parent">Create parent</button>
@@ -6,24 +7,24 @@
         <div class="col-lg-4 col-lg-push-5 pager-search" style=""></div>
     </div>
     <div class="row">
-      <div class="col-lg-12">
-        <table class="table table-striped">
-            <thead class="pager-head">
-                <tr>
-                    <th class="pager-header first_name"></th>
-                    <th class="pager-header last_name"></th>
-                    <th class="pager-header username"></th>
-                </tr>
-            </thead>
-            <tbody class="pager-body">
-                <tr class="pager-row pointer" data-row-id="">
-                    <td class="pager-column first_name"></td>
-                    <td class="pager-column last_name"></td>
-                    <td class="pager-column username"></td>
-                </tr>
-            </tbody>
-        </table>
-      </div>
+        <div class="col-lg-12">
+            <table class="table table-striped">
+                <thead class="pager-head">
+                    <tr>
+                        <th class="pager-header first_name"></th>
+                        <th class="pager-header last_name"></th>
+                        <th class="pager-header username"></th>
+                    </tr>
+                </thead>
+                <tbody class="pager-body">
+                    <tr class="pager-row" data-row-id="" style="cursor:pointer">
+                        <td class="pager-column first_name"></td>
+                        <td class="pager-column last_name"></td>
+                        <td class="pager-column username"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
     <div id="page-list" style="text-align:center"></div>
 </div>
@@ -31,16 +32,36 @@
 <div id="parent-options" style="display:none">
     <?php echo $form_start ?>
     <?php echo $username_group ?>
+    <table class="table">
+        <tr>
+            <td>
     <fieldset>
         <legend>Parent information</legend>
-    <?php echo $first_name_group ?>
-    <?php echo $last_name_group ?>
+        <?php echo $first_name_group ?>
+        <?php echo $last_name_group ?>
     </fieldset>
-    <?php echo $submit?>
+            </td>
+            <td>
+    <fieldset id="profile-form">
+        <legend>Profile information</legend>
+        <?php echo $student_first_name_group ?>
+        <?php echo $student_last_name_group ?>
+        <?php echo $class_date_group ?>
+    </fieldset>
+            </td>
+        </tr>
+    </table>
+    <div class="text-center"><?php echo $submit?></div>
     <?php echo $form_end?>
-    <div class="text-center" style="margin-top : 10px" id="delete-parent">
+    <div class="text-center" style="margin-top : 10px; border-top : 1px solid #eee; padding : 6px;" id="delete-parent">
         <button class="btn btn-danger" id="delete-button">
             <span class="confirm">Delete parent</span>
         </button>
     </div>
+    <fieldset id="profiles">
+        <legend>Profiles</legend>
+        <div id="profile-list">
+        </div>
+        <button class="btn btn-success" id="create-new-profile" data-parent-id="">Create new profile</button>
+    </fieldset>
 </div>

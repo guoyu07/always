@@ -21,6 +21,12 @@ function parent() {
         this.initDeleteClick();
     };
 
+    this.initCreateProfileClick = function() {
+        $('#create-new-profile').click(function() {
+            window.location.href = 'always/admin/profile/new/?parent_id=' + $(this).data('parentId');
+        });
+    };
+
     this.initNewClick = function() {
         $('#new-parent').click(function() {
             $this.initDeleteClick();
@@ -32,6 +38,8 @@ function parent() {
             $('#username').val('');
             $('#parent-id').val(0);
             $('.username-group').show();
+            $('#profile-form').show();
+            $('#profiles').hide();
             $('#parent-options').dialog({title: $this.dialog_title});
             $('#parent-options').dialog('open');
         });
@@ -39,12 +47,23 @@ function parent() {
     };
 
     this.initDeleteClick = function() {
+        $('#delete-button').unbind();
         $('#delete-button .confirm').html('Delete parent');
 
         $('#delete-button').click(function() {
             $('.confirm', this).html('Click again to confirm deletion');
+            $(document).click(function(event) {
+                if ($(event.target).closest('#delete-button').length == 0) {
+                    $this.initDeleteClick();
+                }
+            });
             $('#delete-button').click(function() {
-
+                $.get('always/admin/parents/', {
+                    'command': 'delete_parent',
+                    'parent_id': $('#parent-id').val()
+                }, function() {
+                    window.location.reload();
+                }, 'json');
             });
         });
     };
@@ -56,12 +75,20 @@ function parent() {
             var row_id = $(this).data('rowId');
             $.get('always/admin/parents/', {
                 'command': 'edit_parent',
-                'pid': row_id
+                'parent_id': row_id
             }, function(data) {
+                if (data.error !== undefined) {
+                    $('body').append('<table>' + data.error.exception.xdebug_message + '</table>');
+                }
+                if (data.profile_list !== undefined) {
+                    $('#profile-list').html(data.profile_list);
+                }
                 $this.dialog_title = 'Update parent account';
                 $('#first_name').val(data['first_name']);
                 $('#last_name').val(data['last_name']);
                 $('.username-group').hide();
+                $('#profile-form').hide();
+                $('#profiles').show();
                 $('#parent-id').val(row_id);
                 $('#parent-options').dialog({title: $this.dialog_title});
                 $('#parent-options').dialog('open');

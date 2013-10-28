@@ -9,12 +9,34 @@ namespace always;
  */
 class Menu {
 
-    public function get(\Request $request)
+    private $active;
+
+    public function __construct($active)
     {
-        $token = $request->getNextRequest()->getCurrentToken();
-        $template = new \Template(array($token=>1));
-        $template->setModuleTemplate('always', 'Admin/Menu/Main.html');
+        $this->active = $active;
+    }
+
+    public function get()
+    {
+        $template = new \Template;
+        switch ($this->active) {
+            case 'parents':
+                $template->add('parents_active', 1);
+                break;
+            case 'profiles':
+                $template->add('profiles_active', 1);
+                break;
+            case 'settings':
+                $template->add('settings_active', 1);
+                break;
+        }
+        $template->setModuleTemplate('always', 'Admin/Menu.html');
         return $template->get();
+    }
+
+    public function __toString()
+    {
+        return $this->get();
     }
 }
 
