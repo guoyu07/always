@@ -13,10 +13,10 @@ function always_install(&$content)
     $db->begin();
 
     try {
-        $parent = new always\Parents;
+        $parent = new always\Resource\Parents;
         $st = $parent->createTable($db);
 
-        $profile = new always\Profile;
+        $profile = new always\Resource\Profile;
         $pt = $profile->createTable($db);
 
         $index = new \Database\Index($pt->getDataType('pname'), 'pname');
