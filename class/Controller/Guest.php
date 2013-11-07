@@ -64,7 +64,8 @@ class Guest extends \Http\Controller {
 
     private function listing()
     {
-        $profiles = \always\Factory\ProfileFactory::getApprovedNameList();
+        $profiles = \always\Factory\ProfileFactory::getProfiles(true);
+        $data['profiles'] = $profiles;
         $template = new \Template();
         $template->setModuleTemplate('always', 'Guest/List.html');
         $template->addVariables($data);

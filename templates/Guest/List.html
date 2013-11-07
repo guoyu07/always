@@ -1,0 +1,26 @@
+<?php
+    if (empty($profiles)) {
+        echo 'No profiles have been created.';
+        return;
+    }
+    $column_count = 0;
+?>
+
+<table class="table table-striped">
+    <?php
+    foreach ($profiles as $p):
+        if ($column_count == 0) {
+            echo '<tr>';
+        }
+    ?>
+    <td><a href="always/<?=$p->getPname();?>"><?=$p->getFullName();?></a></td>
+    <?php
+        if ($column_count >= 2) {
+            echo '</tr>';
+            $column_count = 0;
+        } else {
+            $column_count++;
+        }
+        endforeach;
+    ?>
+</table>

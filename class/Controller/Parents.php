@@ -118,6 +118,7 @@ class Parents extends \Http\Controller {
         $data = array();
         $profiles = \always\Factory\ProfileFactory::getProfilesByParentId($this->parent->getId());
         foreach ($profiles as $pf) {
+            $sub['pname'] = $pf->getPname();
             $sub['name'] = $pf->getFullName();
             $sub['picture'] = $pf->getProfilePic();
             $sub['summary'] = $pf->getSummary();

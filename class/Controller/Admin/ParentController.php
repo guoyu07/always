@@ -13,6 +13,9 @@ require_once PHPWS_SOURCE_DIR . 'mod/always/inc/defines.php';
 class ParentController extends \Http\Controller {
 
     private $menu;
+    /**
+     * @var \always\Resource\Parents
+     */
     private $parent;
 
     public function __construct(\Module $module)
@@ -50,6 +53,7 @@ class ParentController extends \Http\Controller {
 
         $profile = new \always\Resource\Profile;
         $profile->setFirstName($request->getVar('student_first_name'));
+        $profile->setMiddleName($request->getVar('student_middle_name'));
         $profile->setLastName($request->getVar('student_last_name'));
         $profile->setClassDate($request->getVar('class_date'));
         $profile->setParentId($this->parent->getId());
@@ -57,21 +61,69 @@ class ParentController extends \Http\Controller {
         \always\Factory\ProfileFactory::save($profile);
     }
 
+    private function emailParent()
+    {
+        require_once PHPWS_SOURCE_DIR . 'lib/Swift/lib/swift_required.php';
+
+        $subject = 'Invitation to Always a Mountaineer';
+        $from_email = \Settings::get('always', 'contact_email');
+        $from_full_name = 'Always website';
+
+        $to_email = $this->parent->getUsername();
+        $to_full_name = $this->parent->getFullName();
+
+        $vars['full_name'] = $this->parent->getFullName();
+        $vars['username'] = $this->parent->getUsername();
+        $vars['password'] = $this->parent->getPassword();
+        $vars['site_address'] = 'http://always.appstate.edu';
+        $vars['contact_email'] = \Settings::get('always', 'contact_email');
+        $template = new \Template($vars);
+        $template->setModuleTemplate('always', 'Admin/Parents/Invitation.html');
+
+        $body = $template->get();
+
+        $message = \Swift_Message::newInstance()->setContentType('text/html')
+                ->setSubject($subject)
+                ->setFrom(array($from_email => $from_full_name))
+                ->setTo($to_email)
+                ->setBody($body);
+
+        $transport = \Swift_MailTransport::newInstance();
+
+        $mailer = \Swift_Mailer::newInstance($transport);
+
+        $result = $mailer->send($message);
+    }
+
     public function post(\Request $request)
     {
         $this->loadParent($request);
 
-        switch ($request->getVar('command')) {
-            case 'save':
-                $this->saveParent($request);
-                break;
+        try {
+            switch ($request->getVar('command')) {
+                case 'save':
+                    $this->saveParent($request);
+                    $this->emailParent();
+                    break;
 
-            case 'delete':
-                $this->deleteParent();
-                break;
+                case 'delete':
+                    $this->deleteParent();
+                    break;
+            }
+        } catch (\Exception $e) {
+            if ($e instanceof \always\UserException) {
+                $this->sendMessage($e->getMessage());
+            } else {
+                throw $e;
+            }
         }
         $response = new \Http\SeeOtherResponse(\Server::getCurrentUrl(false));
         return $response;
+    }
+
+    private function sendMessage($message)
+    {
+        \Session::getInstance()->always_message = $message;
     }
 
     private function createNewUser($username)
@@ -80,25 +132,21 @@ class ParentController extends \Http\Controller {
         $user = new \PHPWS_User;
 
         if ($user->isDuplicateUsername($username)) {
-            throw new \Exception('User already in system');
+            throw new \always\UserException('User already in system');
         }
 
         $user->username = $user->email = $username;
 
         if ($user->isDuplicateEmail()) {
-            throw new \Exception('Email address already in system');
+            throw new \always\UserException('Email address already in system');
         }
 
         $user->setActive(1);
         $user->setApproved(1);
         $user->save();
 
-        $password = randomString();
-
-        // This is for testing. REMOVE BEFORE PUBLISHING.
-        $password = 'password';
-
-        $password_hash = md5($user->username . $password);
+        $this->parent->createPassword();
+        $password_hash = md5($user->username . $this->parent->getPassword());
 
         $db = \Database::newDB();
         $t = $db->addTable('user_authorization');
@@ -124,6 +172,12 @@ class ParentController extends \Http\Controller {
                 break;
         }
         $template->add('menu', $this->menu->get());
+
+        if (!empty(\Session::getInstance()->always_message)) {
+            $ses = \Session::getInstance();
+            $template->add('message', $ses->always_message);
+            unset($ses->always_message);
+        }
         return $template;
     }
 
@@ -135,28 +189,29 @@ class ParentController extends \Http\Controller {
     private function listing($request)
     {
         \Pager::prepare();
-        javascript('jquery');
         javascript('jquery_ui');
         \Layout::addJSHeader("<script type='text/javascript' src='" .
                 PHPWS_SOURCE_HTTP . "mod/always/javascript/Parents/script.js'></script>");
         \Layout::addStyle('always', 'style.css');
         $parent = new \always\Resource\Parents;
+
         $form = $parent->pullForm();
         $form->requiredScript();
         $form->appendCSS('bootstrap');
-        $form->setAction('/always/admin/parents');
+        $form->setAction('always/admin/parents');
         $form->addHidden('command', 'save');
         $form->addHidden('parent_id', 0);
 
-        if (!$parent->getId()) {
-            $form->addEmail('username')->setPlaceholder("Enter parent's email address")->setRequired();
-        }
+        //if (!$parent->getId()) {
+        $form->addEmail('username')->setPlaceholder("Enter parent's email address")->setRequired();
+        //}
 
         $form->getSingleInput('first_name')->setRequired();
         $form->getSingleInput('last_name')->setRequired();
 
-        $form->addTextField('student_first_name')->setRequired();
-        $form->addTextField('student_last_name')->setRequired();
+        $form->addTextField('student_first_name')->setRequired()->setLabel('First name');
+        $form->addTextField('student_middle_name')->setLabel('Middle name');
+        $form->addTextField('student_last_name')->setRequired()->setLabel('Last name');
 
         $class_date = range(CLASS_DATE_LOW_RANGE, date('Y') + 4, 1);
         $class_date = array_combine($class_date, $class_date);
@@ -230,9 +285,8 @@ class ParentController extends \Http\Controller {
 
         $content[] = '<ul style="margin-left:4px;padding-left:0px;list-style-type:none">';
         foreach ($profiles as $p) {
-            $content[] = '<li><a href="always/admin/profiles/update?parent_id='
-                    . $parent_id . '&amp;original_id=' . $p->getOriginalId() . '">' . $p->getFullName() . ' - Class of '
-                    . $p->getClassDate() . '</a></li>';
+            $content[] = '<li>' . $p->getFullName() . ' - Class of ' . $p->getClassDate() . ' <a class="btn btn-default btn-sm" href="always/admin/profiles/update?parent_id='
+                    . $parent_id . '&amp;original_id=' . $p->getOriginalId() . '">Update</a> <a class="btn btn-default btn-sm" href="always/' . $p->getPName() . '">View</a></li>';
         }
         $content[] = '</ul>';
         return implode("\n", $content);

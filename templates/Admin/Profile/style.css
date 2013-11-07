@@ -3,22 +3,41 @@
     background-color : white;
 }
 
-del.diffmod,
-ins.diffins {
-    color : white;
+del, ins {
     border-radius: 3px;
     text-decoration : none;
 }
 
+del.diffmod,
+ins.diffmod,
+.altered {
+    background-color : yellow;
+    border-color : yellow;
+}
+
+ins.diffmod {
+    padding-left : .5em;
+}
+
 del.diffmod {
-    background-color : red;
-    border : 1px solid red;
     text-decoration : line-through;
+    padding-right : .5em;
 }
 
 ins.diffins {
-    background-color : green;
-    border : 1px solid green;
+
+}
+
+del.diffdel {
+    background-color : #FF9797;
+    border : 1px solid #FF9797;
+    color : black;
+    margin : 0px 4px;
+}
+
+ins.diffins {
+    background-color : #5CB85C;
+    border : 1px solid #5CB85C;
 }
 
 div.compare {

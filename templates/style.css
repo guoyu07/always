@@ -5,3 +5,7 @@
 .btn {
     margin-bottom : 4px;
 }
+
+.student-name a {
+    color : black;
+}

@@ -10,7 +10,14 @@ namespace always\Controller\Admin;
  */
 class ProfileController extends \Http\Controller {
 
+    /**
+     * @var \always\Resource\Profile
+     */
     private $profile;
+
+    /**
+     * @var \always\Resource\Parents
+     */
     private $parent;
 
     public function get(\Request $request)
@@ -20,7 +27,7 @@ class ProfileController extends \Http\Controller {
         $response = new \Response($view);
         return $response;
     }
-
+    
     public function post(\Request $request)
     {
         $cmd = $request->shiftCommand();
@@ -44,7 +51,8 @@ class ProfileController extends \Http\Controller {
 
     private function postProfile(\Request $request)
     {
-        \always\Factory\ProfileFactory::post($request, $this->profile, $this->parent);
+        \always\Factory\ProfileFactory::post($request, $this->profile,
+                $this->parent);
         \always\Factory\ProfileFactory::save($this->profile);
     }
 
@@ -57,7 +65,6 @@ class ProfileController extends \Http\Controller {
         if (empty($cmd)) {
             $cmd = 'list';
         }
-
         switch ($cmd) {
             case 'new':
                 $this->loadProfile($request);
@@ -100,6 +107,9 @@ class ProfileController extends \Http\Controller {
 
     private function diff(\Request $request)
     {
+        javascript('jquery');
+        \Layout::addJSHeader("<script type='text/javascript' src='" .
+                PHPWS_SOURCE_HTTP . "mod/always/javascript/Profiles/diff.js'></script>");
         $this->loadProfile($request);
 
         $compare = \always\Factory\ProfileFactory::getProfileByOriginalId($this->profile->getOriginalId(),
@@ -116,6 +126,7 @@ class ProfileController extends \Http\Controller {
     {
         $this->loadProfile($request);
         $viewtpl = \always\Factory\ProfileFactory::display($this->profile);
+        $variables['needs_approval'] = !$this->profile->isApproved();
         $variables['content'] = $viewtpl->get();
         $variables['profile_id'] = $this->profile->getId();
         $template = new \Template($variables);
@@ -136,10 +147,8 @@ class ProfileController extends \Http\Controller {
     private function listing()
     {
         \Pager::prepare();
+        javascript('jquery_ui');
         /*
-          javascript('jquery');
-
-          javascript('jquery_ui');
           \Layout::addJSHeader("<script type='text/javascript' src='" .
           PHPWS_SOURCE_HTTP . "mod/always/javascript/Profiles/script.js'></script>");
          *
@@ -198,7 +207,7 @@ class ProfileController extends \Http\Controller {
             if ($profile->isSubmitted()) {
                 // profile was submitted and is awaiting approval, force view
                 // so admin may approve
-                return \always\Factory\ProfileFactory::view($profile);
+                return \always\Factory\ProfileFactory::display($profile);
             } elseif (!$profile->isFirst()) {
                 // not the first version, not approved and not submitted.
                 // Since this is a work in progress from the parent we pull the
@@ -216,14 +225,13 @@ class ProfileController extends \Http\Controller {
     private function pagerData()
     {
 
-        extract(\always\Factory\ProfileFactory::getLastVersionDB());
-        $t1->addFieldConditional('submitted', 1);
-        $t1->addFieldConditional('approved', 0);
+        extract(\always\Factory\ProfileFactory::getLastVersionDB(false));
+        $profile_table->addFieldConditional('submitted', 1);
         $pager = new \DatabasePager($db);
         $pager->setCallback(array('\always\Controller\Admin\ProfileController', 'parseRow'));
         $pager->setHeaders(array('last_name' => 'Full name', 'last_updated' => 'Last updated'));
-        $tbl_headers['last_name'] = $t1->getField('last_name');
-        $tbl_headers['last_updated'] = $t1->getField('last_updated');
+        $tbl_headers['last_name'] = $profile_table->getField('last_name');
+        $tbl_headers['last_updated'] = $profile_table->getField('last_updated');
         $pager->setTableHeaders($tbl_headers);
         $pager->setId('parent-list');
         $pager->setRowIdColumn('id');
@@ -234,7 +242,11 @@ class ProfileController extends \Http\Controller {
     {
         $profile_id = $row['id'];
         $row['full_name'] = $row['last_name'] . ', ' . $row['first_name'];
-        $row['last_updated'] = strftime('%c', $row['last_updated']);
+        if ($row['last_updated']) {
+            $row['last_updated'] = strftime('%c', $row['last_updated']);
+        } else {
+            $row['last_updated'] = 'Never';
+        }
         $row['action'] = <<<EOF
 <a href="always/admin/profiles/view?profile_id=$profile_id" class="btn btn-sm btn-default">View</a>
 <a href="always/admin/profiles/diff?profile_id=$profile_id" class="btn btn-sm btn-default">Diff</a>

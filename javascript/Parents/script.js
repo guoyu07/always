@@ -19,6 +19,7 @@ function parent() {
         this.initNewClick();
         this.initEditClick();
         this.initDeleteClick();
+        this.initCreateProfileClick();
     };
 
     this.initCreateProfileClick = function() {
@@ -73,6 +74,7 @@ function parent() {
             $this.initDeleteClick();
             $('#delete-parent').show();
             var row_id = $(this).data('rowId');
+            $('#create-new-profile').attr('data-parent-id', row_id);
             $.get('always/admin/parents/', {
                 'command': 'edit_parent',
                 'parent_id': row_id

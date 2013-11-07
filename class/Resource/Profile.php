@@ -106,7 +106,6 @@ class Profile extends \Resource {
      * @var \Variable\DateTime
      */
     protected $last_updated;
-
     protected $table = 'always_profile';
 
     public function __construct()
@@ -118,6 +117,9 @@ class Profile extends \Resource {
         $this->first_name = new \Variable\TextOnly(null, 'first_name');
         $this->first_name->allowEmpty(false);
         $this->first_name->setLimit(50);
+        $this->middle_name = new \Variable\TextOnly(null, 'middle_name');
+        $this->middle_name->allowEmpty(true);
+        $this->middle_name->setLimit(50);
         $this->last_name = new \Variable\TextOnly(null, 'last_name');
         $this->last_name->allowEmpty(false);
         $this->last_name->setLimit(50);
@@ -210,8 +212,13 @@ class Profile extends \Resource {
 
     public function loadPname()
     {
-        $this->pname = preg_replace('/[^\w\-]/', '-',
-                $this->first_name . '-' . $this->last_name);
+        if (!$this->middle_name->isEmpty()) {
+            $this->pname = preg_replace('/[^\w\-]/', '-',
+                    $this->first_name . '-' . $this->middle_name . '-' . $this->last_name);
+        } else {
+            $this->pname = preg_replace('/[^\w\-]/', '-',
+                    $this->first_name . '-' . $this->last_name);
+        }
     }
 
     /**
@@ -221,6 +228,15 @@ class Profile extends \Resource {
     public function getFirstName()
     {
         return $this->first_name->get();
+    }
+
+    /**
+     *
+     * @return string
+     */
+    public function getMiddleName()
+    {
+        return $this->middle_name->get();
     }
 
     /**
@@ -240,6 +256,11 @@ class Profile extends \Resource {
     public function setFirstName($name)
     {
         $this->first_name->set(ucwords(trim($name)));
+    }
+
+    public function setMiddleName($name)
+    {
+        $this->middle_name->set(ucwords(trim($name)));
     }
 
     public function setLastEditor($editor)

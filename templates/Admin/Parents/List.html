@@ -1,3 +1,6 @@
+<?php if(isset($message)):?>
+<div class="alert alert-danger">Sorry... Your last action failed. <?=$message?></div>
+<?php endif; ?>
 <div class="pager-listing" id="parent-list" data-rpp="10" data-pager-url="always/admin/parents/?command=pager">
     <?=$menu?>
     <div class="row">
@@ -35,19 +38,20 @@
     <table class="table">
         <tr>
             <td>
-    <fieldset>
-        <legend>Parent information</legend>
-        <?php echo $first_name_group ?>
-        <?php echo $last_name_group ?>
-    </fieldset>
+                <fieldset>
+                    <legend>Parent information</legend>
+                    <?php echo $first_name_group ?>
+                    <?php echo $last_name_group ?>
+                </fieldset>
             </td>
             <td>
-    <fieldset id="profile-form">
-        <legend>Profile information</legend>
-        <?php echo $student_first_name_group ?>
-        <?php echo $student_last_name_group ?>
-        <?php echo $class_date_group ?>
-    </fieldset>
+                <fieldset id="profile-form">
+                    <legend>Student information</legend>
+                    <?php echo $student_first_name_group ?>
+                    <?php echo $student_middle_name_group ?>
+                    <?php echo $student_last_name_group ?>
+                    <?php echo $class_date_group ?>
+                </fieldset>
             </td>
         </tr>
     </table>
@@ -62,6 +66,6 @@
         <legend>Profiles</legend>
         <div id="profile-list">
         </div>
-        <button class="btn btn-success" id="create-new-profile" data-parent-id="">Create new \always\Resource\Profile</button>
+        <button class="btn btn-success" id="create-new-profile" data-parent-id="">Create new Profile</button>
     </fieldset>
 </div>

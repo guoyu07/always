@@ -43,6 +43,12 @@ class Parents extends \Resource {
      */
     protected $table = 'always_parents';
 
+    /**
+     * Temporary storage of password
+     * @var string
+     */
+    private $password;
+
     public function __construct()
     {
         parent::__construct();
@@ -138,6 +144,20 @@ class Parents extends \Resource {
         $this->version++;
     }
 
+    public function createPassword()
+    {
+        $this->password = randomString();
+    }
+
+    public function setPassword($password)
+    {
+        $this->password = $password;
+    }
+
+    public function getPassword()
+    {
+        return $this->password;
+    }
 
 }
 

@@ -1,42 +1,32 @@
-<div class="row">
-    <div class="col-lg-10 col-lg-push-1">
-        <div class="border-box top-box"></div>
-        <div class="bg-tl">
-            <p class="lead" style="padding-top: 15px;">The Student Memorial Program remembers and honors previously enrolled Appalachian students who have passed away.
-                The plaque in the B.B. Dougherty Administration Building memorializes these students.
-                Each Fall, Appalachian invites these students' families to campus for a special Student Memorial Program. During this program we honor and remember these
-                Mountaineers by reading their names and families' words of remembrance.</p>
+<div class="border-box top-box"></div>
+<div class="bg-tl">
+    <p class="lead" style="padding-top: 15px;">The Student Memorial Program remembers and honors previously enrolled Appalachian students who have passed away.
+        The plaque in the B.B. Dougherty Administration Building memorializes these students.
+        Each Fall, Appalachian invites these students' families to campus for a special Student Memorial Program. During this program we honor and remember these
+        Mountaineers by reading their names and families' words of remembrance.</p>
 
-            <p class="lead" style="text-align:center;">These students will &ldquo;Always be a Mountaineer.&rdquo;</p>
+    <p class="lead" style="text-align:center;">These students will &ldquo;Always be a Mountaineer.&rdquo;</p>
 
-            <div class="container">
-                <div class="row text-center student-search">
-                    <div class="col-lg-4 col-lg-offset-2 col-md-4 col-md-offset-2 col-sm-4 col-sm-offset-1 col-xs-12 text-center">
-                    <form>
-                            <div class="input-group" style="width:250px; margin: 0px auto">
-                                <input type="text" class="form-control" fname="always_search" placeholder="Search for student" id="always-search" />
-                                <span class="input-group-btn">
-                                    <button class="btn btn-default">Find</button>
-                                </span>
-                            </div>
-                    </form>
+        <div class="row text-center student-search">
+            <div class="col-lg-6 text-center">
+                <form>
+                    <div class="input-group" style="width:250px; margin: 0px auto">
+                        <input type="text" class="form-control" fname="always_search" placeholder="Search for student" id="always-search" />
+                        <span class="input-group-btn">
+                            <button class="btn btn-default">Find</button>
+                        </span>
                     </div>
-                    <div class="col-lg-6 col-md-6">
-                        <a href="always/list" class="btn btn-default">Browse Student Profiles</a>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 text-center">
-                    <button class="btn btn-default btn-large">Browse Student Profiles</button>
-                </div>
+                </form>
             </div>
-
-            <?php if ($parent): ?>
-                <div class="text-center">
-                    <a href="always/parent/list"><button class="btn btn-default">My profiles</button></a>
-                </div>
-                <?php endif; ?>
+            <div class="col-lg-6 text-center">
+                <a href="always/list" class="btn btn-default">Browse Student Profiles</a>
             </div>
         </div>
-        <div class="border-box bottom-box"></div>
+
+    <?php if ($parent): ?>
+    <div class="text-center">
+        <a href="always/parent/list"><button class="btn btn-default">My profiles</button></a>
     </div>
+    <?php endif; ?>
 </div>
+<div class="border-box bottom-box"></div>

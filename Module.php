@@ -7,7 +7,7 @@ namespace always;
  * @author Matthew McNaney <mcnaney at gmail dot com>
  * @license http://opensource.org/licenses/lgpl-3.0.html
  */
-class Module extends \Module {
+class Module extends \Module implements \SettingDefaults{
 
     public function __construct()
     {
@@ -40,6 +40,12 @@ class Module extends \Module {
             $template = Controller\Guest::welcome();
             \Layout::add($template->get());
         }
+    }
+
+    public function getSettingDefaults()
+    {
+        $array['contact_email'] = 'replaceme@notarealsite.com';
+        return $array;
     }
 
 }
