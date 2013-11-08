@@ -27,7 +27,7 @@ class ProfileController extends \Http\Controller {
         $response = new \Response($view);
         return $response;
     }
-    
+
     public function post(\Request $request)
     {
         $cmd = $request->shiftCommand();
@@ -115,6 +115,10 @@ class ProfileController extends \Http\Controller {
         $compare = \always\Factory\ProfileFactory::getProfileByOriginalId($this->profile->getOriginalId(),
                         true);
 
+        if (empty($compare)) {
+            throw new \Exception('Nothing to compare against. New profile.');
+        }
+
         $tpl = \always\Factory\ProfileFactory::diff($compare, $this->profile);
         $template = new \Template($tpl);
         $template->setModuleTemplate('always', 'Admin/Profile/Diff.html');
@@ -126,6 +130,8 @@ class ProfileController extends \Http\Controller {
     {
         $this->loadProfile($request);
         $viewtpl = \always\Factory\ProfileFactory::display($this->profile);
+        // zero version has nothing to diff against
+        $variables['can_diff'] = $this->profile->getVersion() > 0 ? 1 : 0;
         $variables['needs_approval'] = !$this->profile->isApproved();
         $variables['content'] = $viewtpl->get();
         $variables['profile_id'] = $this->profile->getId();
@@ -224,7 +230,6 @@ class ProfileController extends \Http\Controller {
 
     private function pagerData()
     {
-
         extract(\always\Factory\ProfileFactory::getLastVersionDB(false));
         $profile_table->addFieldConditional('submitted', 1);
         $pager = new \DatabasePager($db);
@@ -249,8 +254,12 @@ class ProfileController extends \Http\Controller {
         }
         $row['action'] = <<<EOF
 <a href="always/admin/profiles/view?profile_id=$profile_id" class="btn btn-sm btn-default">View</a>
+EOF;
+        if ($row['version'] > 1) {
+            $row['action'] .= <<<EOF
 <a href="always/admin/profiles/diff?profile_id=$profile_id" class="btn btn-sm btn-default">Diff</a>
 EOF;
+        }
         return $row;
     }
 
@@ -269,5 +278,4 @@ EOF;
     }
 
 }
-
 ?>

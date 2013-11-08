@@ -2,12 +2,14 @@
     <ul style="list-style-type: none; padding:0px">
         <?php foreach ($listing as $profile): extract($profile);?>
         <li>
-            <div class="pull-left" style="margin-right : 9px"><?=$picture?></div>
+            <div class="pull-left" style="margin-right : 9px">
+                <img class="img-responsive" src="<?=$profile_pic?>" style="width:200px">
+            </div>
             <div>
                 <div class="pull-right" style="margin:5px 5px" >
-                    <a href="always/parent/update?original_id=<?=$original_id?>" class="btn btn-primary btn-default btn-lg"><i class="fa fa-pencil"></i> Update</a>
+                    <a href="always/parent/update?original_id=<?=$original_id?>" class="btn btn-primary btn-default"><i class="fa fa-pencil"></i> Update</a>
                     <?php if ($publish): ?>
-                    <a href="always/parent/publish?profile_id=<?=$profile_id?>" class="btn btn-default btn-lg btn-success"><i class="fa fa-success fa-flag-checkered"></i> Publish</a>
+                    <a href="always/parent/publish?profile_id=<?=$profile_id?>" class="btn btn-default btn-success"><i class="fa fa-success fa-flag-checkered"></i> Publish</a>
                     <?php endif;?>
                 </div>
                 <h2 class="student-name"><a href="always/<?=$pname?>"><?=$name?></a></h2>

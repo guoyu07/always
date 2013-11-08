@@ -117,11 +117,14 @@ class Parents extends \Http\Controller {
     {
         $data = array();
         $profiles = \always\Factory\ProfileFactory::getProfilesByParentId($this->parent->getId());
+
         foreach ($profiles as $pf) {
+            $pic = $pf->getProfilePic();
+
             $sub['pname'] = $pf->getPname();
             $sub['name'] = $pf->getFullName();
-            $sub['picture'] = $pf->getProfilePic();
             $sub['summary'] = $pf->getSummary();
+            $sub['profile_pic'] = $pic->getSrc();
             $sub['original_id'] = $pf->getOriginalId();
             $sub['profile_id'] = $pf->getId();
             $sub['publish'] = !$pf->isSubmitted();

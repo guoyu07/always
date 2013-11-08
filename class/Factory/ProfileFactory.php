@@ -258,6 +258,11 @@ class ProfileFactory {
 
     public static function display(\always\Resource\Profile $profile)
     {
+        javascript('jquery');
+        $script = '<script type="text/javascript" src="' . PHPWS_SOURCE_HTTP . 'mod/always/javascript/fancybox/source/jquery.fancybox.js"></script>
+            <script type="text/javascript" src="' . PHPWS_SOURCE_HTTP . 'mod/always/javascript/fancybox/load.js"></script>
+            <link rel="stylesheet" type="text/css" href="' . PHPWS_SOURCE_HTTP . 'mod/always/javascript/fancybox/source/jquery.fancybox.css?v=2.1.5" media="screen" />';
+        \Layout::addJSHeader($script);
         $data = $profile->getStringVars();
         $data['full_name'] = $profile->getFullName();
         $data['approve'] = false;
@@ -364,14 +369,16 @@ class ProfileFactory {
     {
         $profile->loadPname();
 
+        \ResourceFactory::saveResource($profile);
         /**
          * The first version will be zero. So if getVersion is false, we copy
          * the id to original id column.
          */
-        if (!$profile->getVersion()) {
+        $version = $profile->getVersion();
+        if (!$version) {
             $profile->copyOriginalId();
+            \ResourceFactory::saveResource($profile);
         }
-        \ResourceFactory::saveResource($profile);
     }
 
 }

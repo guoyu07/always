@@ -8,15 +8,14 @@
  */
 function always_install(&$content)
 {
-    Database::phpwsDSNLoader(PHPWS_DSN);
     $db = Database::newDB();
     $db->begin();
 
     try {
-        $parent = new always\Resource\Parents;
+        $parent = new \always\Resource\Parents;
         $st = $parent->createTable($db);
 
-        $profile = new always\Resource\Profile;
+        $profile = new \always\Resource\Profile;
         $pt = $profile->createTable($db);
 
         $index = new \Database\Index($pt->getDataType('pname'), 'pname');

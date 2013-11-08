@@ -285,7 +285,7 @@ class Profile extends \Resource {
 
     public function getVersion()
     {
-        return $this->version;
+        return $this->version->get();
     }
 
     public function getViewUrl()
