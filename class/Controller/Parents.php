@@ -26,7 +26,8 @@ class Parents extends \Http\Controller {
         $this->loadCurrentParent();
         $this->loadProfile($request);
 
-        \always\Factory\ProfileFactory::post($request, $this->profile, $this->parent);
+        \always\Factory\ProfileFactory::post($request, $this->profile,
+                $this->parent);
         $this->profile->setApproved(false);
         if ($request->isVar('save_unpublished')) {
             $this->profile->setSubmitted(false);
@@ -120,11 +121,13 @@ class Parents extends \Http\Controller {
 
         foreach ($profiles as $pf) {
             $pic = $pf->getProfilePic();
+            if ($pic) {
+                $sub['profile_pic'] = $pic->getSrc();
+            }
 
             $sub['pname'] = $pf->getPname();
             $sub['name'] = $pf->getFullName();
             $sub['summary'] = $pf->getSummary();
-            $sub['profile_pic'] = $pic->getSrc();
             $sub['original_id'] = $pf->getOriginalId();
             $sub['profile_id'] = $pf->getId();
             $sub['publish'] = !$pf->isSubmitted();
