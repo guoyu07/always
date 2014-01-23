@@ -31,21 +31,24 @@ class ProfileController extends \Http\Controller {
     public function post(\Request $request)
     {
         $cmd = $request->shiftCommand();
-
+        $this->loadProfile($request);
         switch ($cmd) {
+            case 'new':
+                $this->loadParent($request);
+                break;
+
             case 'update':
-                $this->loadProfile($request);
                 $this->loadParentFromProfile();
-                $this->postProfile($request);
-                if ($this->profile->isApproved()) {
-                    $forward_url = \Server::getSiteUrl() . 'always/' . $this->profile->getPname();
-                } else {
-                    $forward_url = \Server::getSiteUrl() . 'always/admin/';
-                }
-                $response = new \Http\TemporaryRedirectResponse($forward_url);
                 break;
         }
+        $this->postProfile($request);
 
+        if ($this->profile->isApproved()) {
+            $forward_url = \Server::getSiteUrl() . 'always/' . $this->profile->getPname();
+        } else {
+            $forward_url = \Server::getSiteUrl() . 'always/admin/';
+        }
+        $response = new \Http\TemporaryRedirectResponse($forward_url);
         return $response;
     }
 
@@ -67,8 +70,9 @@ class ProfileController extends \Http\Controller {
         }
         switch ($cmd) {
             case 'new':
+                $this->loadParent($request);
                 $this->loadProfile($request);
-                $this->profile->setParentId($request->getVar('parent_id'));
+                $this->profile->setParentId($this->parent->getId());
                 return $this->form();
                 break;
 
@@ -147,7 +151,7 @@ class ProfileController extends \Http\Controller {
 
     private function form()
     {
-        return \always\Factory\ProfileFactory::update($this->profile);
+        return \always\Factory\ProfileFactory::form($this->profile);
     }
 
     private function listing()
@@ -167,7 +171,7 @@ class ProfileController extends \Http\Controller {
 
     private function loadProfile(\Request $request)
     {
-        if ($request->isVar('profile_id')) {
+        if ($request->isVar('profile_id') && $request->getVar('profile_id')) {
             $this->profile = \always\Factory\ProfileFactory::getProfileById($request->getVar('profile_id'));
         } else {
             $this->profile = new \always\Resource\Profile;
@@ -223,7 +227,7 @@ class ProfileController extends \Http\Controller {
             }
         }
 
-        $template = \always\Factory\ProfileFactory::update($profile);
+        $template = \always\Factory\ProfileFactory::form($profile);
 
         return $template;
     }
@@ -278,4 +282,5 @@ EOF;
     }
 
 }
+
 ?>

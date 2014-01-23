@@ -2,9 +2,11 @@
     <ul style="list-style-type: none; padding:0px">
         <?php foreach ($listing as $profile): extract($profile);?>
         <li>
+            <?php if (!empty($profile_pic)): ?>
             <div class="pull-left" style="margin-right : 9px">
                 <img class="img-responsive" src="<?=$profile_pic?>" style="width:200px">
             </div>
+            <?php endif; ?>
             <div>
                 <div class="pull-right" style="margin:5px 5px" >
                     <a href="always/parent/update?original_id=<?=$original_id?>" class="btn btn-primary btn-default"><i class="fa fa-pencil"></i> Update</a>

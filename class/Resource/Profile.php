@@ -41,6 +41,12 @@ class Profile extends \Resource {
      *
      * @var \Variable\TextOnly
      */
+    protected $middle_name;
+
+    /**
+     *
+     * @var \Variable\TextOnly
+     */
     protected $last_name;
 
     /**
@@ -111,7 +117,8 @@ class Profile extends \Resource {
     public function __construct()
     {
         parent::__construct();
-        $this->parent_id = new \Variable\Integer(null, 'parent_id');
+        $this->parent_id = new \Variable\Integer(0, 'parent_id');
+        $this->parent_id->setRange(1);
         $this->original_id = new \Variable\Integer(null, 'original_id');
         $this->pname = new \Variable\Attribute(null, 'pname');
         $this->first_name = new \Variable\TextOnly(null, 'first_name');
@@ -135,7 +142,7 @@ class Profile extends \Resource {
         $this->story = new \Variable\String(null, 'story');
         $this->story->setInputType('textarea');
         $this->story->setColumnType('Text');
-        $this->bg = new \Variable\Integer(null, 'bg');
+        $this->bg = new \Variable\Integer(0, 'bg');
         $this->submitted = new \Variable\Bool(0, 'submitted');
         $this->version = new \Variable\Integer(0, 'version');
         $this->approved = new \Variable\Bool(0, 'approved');

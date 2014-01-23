@@ -186,6 +186,11 @@ class ParentController extends \Http\Controller {
         $this->menu = new \always\Menu('parents');
     }
 
+    /**
+     * Listing of all parents in system.
+     * @param \Request $request
+     * @return \Template
+     */
     private function listing($request)
     {
         \Pager::prepare();

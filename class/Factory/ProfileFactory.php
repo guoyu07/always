@@ -42,7 +42,7 @@ class ProfileFactory {
     {
         $ssdb = \Database::newDB();
         $sstbl = $ssdb->addTable('always_profile');
-        $pid = $sstbl->addField('parent_id');
+        $pid = $sstbl->addField('original_id');
         $exp = new \Database\Expression('max(' . $sstbl->getField('version') . ')',
                 'newest_version');
         $sstbl->addField($exp);
@@ -56,13 +56,12 @@ class ProfileFactory {
         $db = \Database::newDB();
         $profile_table = $db->addTable('always_profile');
 
-        $c1 = new \Database\Conditional($db, $subselect->getField('parent_id'),
-                $profile_table->getField('parent_id'), '=');
+        $c1 = new \Database\Conditional($db, $subselect->getField('original_id'),
+                $profile_table->getField('original_id'), '=');
         $c2 = new \Database\Conditional($db, $exp,
                 $profile_table->getField('version'), '=');
         $c3 = new \Database\Conditional($db, $c1, $c2, 'and');
         $db->joinResources($profile_table, $subselect, $c3);
-
         return array('db' => $db, 'profile_table' => $profile_table);
     }
 
@@ -136,7 +135,6 @@ class ProfileFactory {
         $profile->setLastEditor(\Current_User::getDisplayName());
         $profile->stampLastUpdated();
         $profile->setParentId($parent->getId());
-
         /**
          * This is stub code until multiple images are allowed
          */
@@ -295,14 +293,22 @@ class ProfileFactory {
         return $template;
     }
 
-    public static function update(\always\Resource\Profile $profile)
+    public static function form(\always\Resource\Profile $profile)
     {
         javascript('jquery');
         \Layout::addJSHeader("<script type='text/javascript' src='" .
                 PHPWS_SOURCE_HTTP . "mod/always/javascript/ckeditor/ckeditor.js'></script>");
         $form = $profile->pullForm();
+
+        if (\Current_User::allow('always')) {
+            $form->setAction('always/admin/profiles/new');
+        } else {
+            $form->setAction('always/parent/update');
+        }
+
         $form->requiredScript();
         $form->addHidden('profile_id', $profile->getId());
+        $form->addHidden('parent_id', $profile->getParentId());
         $form->setEnctype(\Form::enctype_multipart);
         $form->appendCSS('bootstrap');
 
@@ -329,7 +335,7 @@ class ProfileFactory {
         if ($profile->isSaved()) {
             $data['title'] = 'Profile for ' . $profile->getFullName();
         } else {
-            $data['title'] = 'Create a new \always\Resource\Profile';
+            $data['title'] = 'Create a new profile for ' . ParentFactory::getParentById($profile->getParentId())->getFullName();
         }
         $template = new \Template($data);
         $template->setModuleTemplate('always', 'Profile/Edit.html');
@@ -368,6 +374,8 @@ class ProfileFactory {
     public static function save(\always\Resource\Profile $profile)
     {
         $profile->loadPname();
+        $profile->setLastEditor(\Current_User::getUsername());
+        $profile->stampLastUpdated();
 
         \ResourceFactory::saveResource($profile);
         /**

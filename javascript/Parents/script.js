@@ -24,7 +24,7 @@ function parent() {
 
     this.initCreateProfileClick = function() {
         $('#create-new-profile').click(function() {
-            window.location.href = 'always/admin/profile/new/?parent_id=' + $(this).data('parentId');
+            window.location.href = 'always/admin/profiles/new/?parent_id=' + $(this).data('parentId');
         });
     };
 

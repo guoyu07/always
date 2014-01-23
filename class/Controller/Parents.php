@@ -111,14 +111,13 @@ class Parents extends \Http\Controller {
     private function update(\Request $request)
     {
         $profile = \always\Factory\ProfileFactory::getUnpublishedProfile($request->getVar('original_id'));
-        return \always\Factory\ProfileFactory::update($profile);
+        return \always\Factory\ProfileFactory::form($profile);
     }
 
     private function listing()
     {
         $data = array();
         $profiles = \always\Factory\ProfileFactory::getProfilesByParentId($this->parent->getId());
-
         foreach ($profiles as $pf) {
             $pic = $pf->getProfilePic();
             if ($pic) {
