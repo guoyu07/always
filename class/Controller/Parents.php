@@ -78,7 +78,37 @@ class Parents extends \Http\Controller {
             case 'publish':
                 return $this->publish($request);
                 break;
+
+            case 'gallery':
+                return $this->gallery();
+                break;
         }
+    }
+
+    /**
+     * Administrative ui for picture gallery
+     */
+    private function gallery()
+    {
+        var_dump($this);
+        exit();
+        $source_dir = PHPWS_SOURCE_HTTP . 'mod/always/javascript/';
+        $admin_script = <<<EOF
+<script src="{$source_dir}jquery_upload/js/tmpl.min.js"></script>
+<script src="{$source_dir}jquery_upload/js/load-image.min.js"></script>
+<script src="{$source_dir}jquery_upload/js/canvas-to-blob.min.js"></script>
+<script src="{$source_dir}gallery/js/jquery.blueimp-gallery.min.js"></script>
+<script src="{$source_dir}jquery_upload/js/jquery.iframe-transport.js"></script>
+<script src="{$source_dir}jquery_upload/js/jquery.fileupload.js"></script>
+<script src="{$source_dir}jquery_upload/js/jquery.fileupload-process.js"></script>
+<script src="{$source_dir}jquery_upload/js/jquery.fileupload-image.js"></script>
+<script src="{$source_dir}jquery_upload/js/jquery.fileupload-validate.js"></script>
+<script src="{$source_dir}jquery_upload/js/jquery.fileupload-ui.js"></script>
+<script src="{$source_dir}jquery_upload/js/jquery.fileupload-jquery-ui.js"></script>
+<script src="{$source_dir}jquery_upload/js/main.js"></script>
+<script src="{$source_dir}Guest/admin.js"></script>
+EOF;
+            \Layout::addJSHeader($admin_script);
     }
 
     private function view()

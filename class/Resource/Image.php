@@ -1,6 +1,6 @@
 <?php
 
-namespace \always\Resource;
+namespace always\Resource;
 
 /**
  *
@@ -16,6 +16,7 @@ class Image extends \Resource {
 
     public function __construct()
     {
+        $this->table = 'always_image';
         $this->path = new \Variable\File(null, 'path');
         $this->caption = new \Variable\TextOnly(null, 'caption');
         $this->profile_id = new \Variable\Integer(0, 'profile_id');

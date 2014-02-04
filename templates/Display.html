@@ -50,6 +50,35 @@
     </div>
 </div>
 
+<?php if ($admin){ echo $image_button ;} ?>
+<?php if (isset($gallery)): ?>
 <div class="row">
-    
+    <div class="border-box top-box"></div>
+    <div class="story bg-tl">
+        <div id="links">
+            <?=$gallery?>
+        </div>
+        <div id="blueimp-gallery" class="blueimp-gallery blueimp-gallery-controls">
+            <div class="slides"></div>
+            <h3 class="title"  style="background-color: rgba(0, 0, 0, 0.8); padding : 10px"></h3>
+            <a class="prev">‹</a>
+            <a class="next">›</a>
+            <a class="close">×</a>
+            <a class="play-pause"></a>
+            <ol class="indicator"></ol>
+        </div>
+    </div>
+    <div class="border-box bottom-box"></div>
 </div>
+<script src="//localhost/phpwebsite/mod/always/javascript/gallery/js/blueimp-gallery.min.js"></script>
+<script>
+document.getElementById('links').onclick = function (event) {
+    event = event || window.event;
+    var target = event.target || event.srcElement,
+        link = target.src ? target.parentNode : target,
+        options = {index: link, event: event, continuous:true},
+        links = this.getElementsByTagName('a');
+    blueimp.Gallery(links, options);
+};
+</script>
+<?php endif; ?>

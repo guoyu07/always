@@ -16,11 +16,11 @@ class Admin extends \Http\Controller {
         if (empty($cmd)) {
             $cmd = 'parents';
         }
-
         $controllers = array(
             'parents' => '\always\Controller\Admin\ParentController',
             'profiles' => '\always\Controller\Admin\ProfileController',
-            'settings' => '\always\Controller\Admin\SettingsController'
+            'settings' => '\always\Controller\Admin\SettingsController',
+            'gallery' => '\always\Controller\Admin\GalleryController'
         );
 
         if (!array_key_exists($cmd, $controllers)) {

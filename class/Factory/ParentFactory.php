@@ -48,8 +48,21 @@ class ParentFactory {
         $user->kill();
 
         $db = \Database::newDB();
-        $db->addTable('always_profile')->addFieldConditional('parent_id', $parent->getId());
+        $db->addTable('always_profile')->addFieldConditional('parent_id',
+                $parent->getId());
+        $profiles = $db->select();
         $db->delete();
+
+        if (!empty($profiles)) {
+            foreach ($profiles as $pf) {
+                $profile = new \always\Resource\Profile;
+                $profile->setVars($pf);
+                $dir = $profile->getImageDirectory();
+                if (is_dir($dir)) {
+                    rmdir($dir);
+                }
+            }
+        }
     }
 
 }

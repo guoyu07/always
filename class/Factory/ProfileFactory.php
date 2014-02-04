@@ -56,7 +56,8 @@ class ProfileFactory {
         $db = \Database::newDB();
         $profile_table = $db->addTable('always_profile');
 
-        $c1 = new \Database\Conditional($db, $subselect->getField('original_id'),
+        $c1 = new \Database\Conditional($db,
+                $subselect->getField('original_id'),
                 $profile_table->getField('original_id'), '=');
         $c2 = new \Database\Conditional($db, $exp,
                 $profile_table->getField('version'), '=');
@@ -257,9 +258,19 @@ class ProfileFactory {
     public static function display(\always\Resource\Profile $profile)
     {
         javascript('jquery');
-        $script = '<script type="text/javascript" src="' . PHPWS_SOURCE_HTTP . 'mod/always/javascript/fancybox/source/jquery.fancybox.js"></script>
-            <script type="text/javascript" src="' . PHPWS_SOURCE_HTTP . 'mod/always/javascript/fancybox/load.js"></script>
-            <link rel="stylesheet" type="text/css" href="' . PHPWS_SOURCE_HTTP . 'mod/always/javascript/fancybox/source/jquery.fancybox.css?v=2.1.5" media="screen" />';
+        javascript('jquery_ui');
+        /*
+          $script = <<<EOF
+          <script type="text/javascript" src="' . PHPWS_SOURCE_HTTP . 'mod/always/javascript/fancybox/source/jquery.fancybox.js"></script>
+          <script type="text/javascript" src="' . PHPWS_SOURCE_HTTP . 'mod/always/javascript/fancybox/load.js"></script>
+          <link rel="stylesheet" type="text/css" href="' . PHPWS_SOURCE_HTTP . 'mod/always/javascript/fancybox/source/jquery.fancybox.css?v=2.1.5" media="screen" />
+          EOF;
+         *
+         */
+        $script = <<<EOF
+<link rel="stylesheet" href="mod/always/javascript/gallery/css/blueimp-gallery.min.css">
+<link rel="stylesheet" href="mod/always/javascript/gallery/css/blueimp-gallery-indicator.css">
+EOF;
         \Layout::addJSHeader($script);
         $data = $profile->getStringVars();
         $data['full_name'] = $profile->getFullName();
@@ -272,6 +283,7 @@ class ProfileFactory {
 
         $parent = ParentFactory::getParentById($profile->getParentId());
         if ($parent->getUserId() == \Current_User::getId()) {
+            $data['image_button'] = '<a class="btn btn-default" href="always/parent/gallery">Update gallery</a>';
             $data['parent_update'] = true;
             $data['admin'] = true;
             if (!$profile->isApproved()) {
@@ -283,11 +295,17 @@ class ProfileFactory {
                 }
             }
         } elseif (\Current_User::allow('always')) {
+            $data['image_button'] = '<a class="btn btn-default" href="always/admin/gallery?profile_id=' . $profile->getId() . '">Update gallery</a>';
             $data['admin'] = true;
             if (!$profile->isApproved() && $profile->isSubmitted()) {
                 $data['approve'] = true;
             }
         }
+
+        $gallery = '<a href="images/always/profile7/Bridge III-01.png" title="The quick brown fox jumped over the lazy dog"><img src="images/always/profile7/thumbnail/Bridge III-01.png" alt="test" /></a>'
+                . '<a href="images/always/profile7/Fall_Panorama1.png" title="The quick brown fox jumped over the lazy dog"><img src="images/always/profile7/thumbnail/Fall_Panorama1.png" alt="test" /></a>';
+
+        $data['gallery'] = $gallery;
         $template = new \Template($data);
         $template->setModuleTemplate('always', 'Display.html');
         return $template;
@@ -342,14 +360,9 @@ class ProfileFactory {
         return $template;
     }
 
-    private static function directorizeUsername($user_name)
-    {
-        return 'images/always/' . preg_replace('@\W@', '-',
-                        str_replace('@', '-at-', $user_name)) . '/';
-    }
-
     public static function saveImage($file, $parent)
     {
+        exit('saveImage needs rewrite');
         $name = $error = $tmp_name = null;
         extract($file);
 
@@ -386,6 +399,11 @@ class ProfileFactory {
         if (!$version) {
             $profile->copyOriginalId();
             \ResourceFactory::saveResource($profile);
+        }
+        $image_dir = $profile->getImageDirectory();
+
+        if (!is_dir($image_dir)) {
+            mkdir($image_dir);
         }
     }
 

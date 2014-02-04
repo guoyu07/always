@@ -290,6 +290,22 @@ class Profile extends \Resource {
         return $this->first_name . ' ' . $this->last_name;
     }
 
+    public function getImageDirectory()
+    {
+        if (empty($this->original_id)) {
+            throw new \Exception('Original id is not set');
+        }
+        return PHPWS_HOME_DIR . 'images/always/profile' . $this->original_id . '/';
+    }
+
+    public function getImageUrl()
+    {
+        if (empty($this->original_id)) {
+            throw new \Exception('Original id is not set');
+        }
+        return '//' . \Server::getSiteUrl(false) . 'images/always/profile' . $this->original_id . '/';
+    }
+
     public function getVersion()
     {
         return $this->version->get();
