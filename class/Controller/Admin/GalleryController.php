@@ -93,7 +93,7 @@ class GalleryController extends \Http\Controller {
 <script src="{$always_url}jquery_upload/js/jquery.fileupload-ui.js"></script>
 <script src="{$always_url}jquery_upload/js/jquery.fileupload-jquery-ui.js"></script>
 <script>var upload_url = '$upload_url';var profile_id = '$profile_id';</script>
-<script src="{$always_url}jquery_upload/js/main.js"></script>
+<script src="{$always_url}jquery_upload/js/always.js"></script>
 
 <!-- The XDomainRequest Transport is included for cross-domain file deletion for IE 8 and IE 9 -->
 <!--[if (gte IE 8)&(lt IE 10)]>
