@@ -149,7 +149,7 @@ class Profile extends \Resource {
         $this->last_editor = new \Variable\TextOnly(null, 'last_editor');
         $this->last_editor->setLimit(100);
         $this->last_editor->allowNull(true);
-        $this->last_updated = new \Variable\Datetime(0, 'last_updated');
+        $this->last_updated = new \Variable\DateTime(0, 'last_updated');
     }
 
     public function getClassDate()

@@ -79,6 +79,7 @@ function parent() {
                 'command': 'edit_parent',
                 'parent_id': row_id
             }, function(data) {
+                console.log(data);
                 if (data.error !== undefined) {
                     $('body').append('<table>' + data.error.exception.xdebug_message + '</table>');
                 }

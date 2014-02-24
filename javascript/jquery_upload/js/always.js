@@ -16,18 +16,26 @@ $(function() {
 
     // Initialize the jQuery File Upload widget:
     $('#fileupload').fileupload({
-        url: upload_url
+        url: upload_url,
+        redirect: window.location.href.replace(
+                /\/[^\/]*$/,
+                '/cors/result.html?%s'
+                ),
+        acceptFileTypes: /(\.|\/)(gif|jpe?g|png)$/i,
+        disableImageResize: /Android(?!.*Chrome)|Opera/
+                .test(window.navigator.userAgent),
+        previewMaxWidth: 80,
+        previewMaxHeight: 80,
+        previewCrop: true
+    }).on('fileuploadprogressall', function(e, data) {
+        var progress = parseInt(data.loaded / data.total * 100, 10);
+        $('.progress-bar').css(
+                'width',
+                progress + '%'
+                );
+    }).on('fileuploadfinished', function(e, data) {
+        initCaption();
     });
-
-    // Enable iframe cross-domain access via redirect option:
-    $('#fileupload').fileupload(
-            'option',
-            'redirect',
-            window.location.href.replace(
-                    /\/[^\/]*$/,
-                    '/cors/result.html?%s'
-                    )
-            );
 
     // Load existing files:
     $('#fileupload').addClass('fileupload-processing');
@@ -43,6 +51,20 @@ $(function() {
         $(this).fileupload('option', 'done')
                 .call(this, $.Event('done'), {result: result});
     });
-    //}
 
+    function initCaption() {
+        
+        $('.caption').focusout(function() {
+            var caption = $(this).val();
+            var profile_id = $(this).data('profileId');
+            var image_id = $(this).data('imageId');
+            $.post('always/admin/gallery/caption', {
+                caption: caption,
+                profile_id: profile_id,
+                image_id: image_id
+            }, function(data){
+                console.log(data);
+            });
+        });
+    }
 });

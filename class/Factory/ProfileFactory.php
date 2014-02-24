@@ -136,23 +136,6 @@ class ProfileFactory {
         $profile->setLastEditor(\Current_User::getDisplayName());
         $profile->stampLastUpdated();
         $profile->setParentId($parent->getId());
-        /**
-         * This is stub code until multiple images are allowed
-         */
-        if ($request->isUploadedFile('profile_pic')) {
-            $pic = $profile->getProfilePic();
-
-            // deleting old picture for new picture
-            if ($pic) {
-                $directory = $pic->getDirectory();
-                $directory->unlink();
-            }
-
-            $file = $request->getUploadedFileArray('profile_pic');
-            $image_path = \always\Factory\ProfileFactory::saveImage($file,
-                            $parent);
-            $profile->setProfilePic($image_path);
-        }
     }
 
     public static function getProfileByOriginalId($original_id, $approved = null)
@@ -302,10 +285,7 @@ EOF;
             }
         }
 
-        $gallery = '<a href="images/always/profile7/Bridge III-01.png" title="The quick brown fox jumped over the lazy dog"><img src="images/always/profile7/thumbnail/Bridge III-01.png" alt="test" /></a>'
-                . '<a href="images/always/profile7/Fall_Panorama1.png" title="The quick brown fox jumped over the lazy dog"><img src="images/always/profile7/thumbnail/Fall_Panorama1.png" alt="test" /></a>';
-
-        $data['gallery'] = $gallery;
+        $data['gallery'] = \always\Factory\ImageFactory::getProfileImages($profile);
         $template = new \Template($data);
         $template->setModuleTemplate('always', 'Display.html');
         return $template;

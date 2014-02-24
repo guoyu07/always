@@ -1,6 +1,9 @@
 <?php
 
 /*
+ * WARNING: Altered to work with Always. Do not overwrite with updatess
+ *
+ *
  * jQuery File Upload Plugin PHP Class 7.1.3
  * https://github.com/blueimp/jQuery-File-Upload
  *
@@ -153,7 +156,7 @@ class UploadHandler {
         );
 
         if ($options) {
-            foreach ($options as $k=>$v) {
+            foreach ($options as $k => $v) {
                 $this->options[$k] = $v;
             }
         }
@@ -321,11 +324,54 @@ class UploadHandler {
         return false;
     }
 
+    private static function getImageProperties()
+    {
+        $request = \Server::getCurrentRequest();
+        $db = \Database::newDB();
+        $tbl = $db->addTable('always_image');
+        $tbl->addFieldConditional('profile_id', $request->getVar('profile_id'));
+        $result = $db->select();
+        if (empty($result)) {
+            return null;
+        }
+        foreach ($result as $img) {
+            $image_properties[$img['path']] = $img;
+        }
+        return $image_properties;
+    }
+
+    public static function fillInFile($file)
+    {
+        static $image_properties = null;
+        if (empty($image_properties)) {
+            $image_properties = self::getImageProperties();
+        }
+        if (is_object($file)) {
+            if (isset($image_properties[$file->name])) {
+                $img = $image_properties[$file->name];
+                $file->caption = $img['caption'];
+                $file->id = $img['id'];
+                $file->profile_id = $img['profile_id'];
+            }
+        } elseif (is_array($file)) {
+            if (isset($image_properties[$file['name']])) {
+                $img = $image_properties[$file['name']];
+                $file['caption'] = $img['caption'];
+                $file['id'] = $img['id'];
+                $file['profile_id'] = $img['profile_id'];
+            }
+        } else {
+            exit('File not object or array');
+        }
+        return $file;
+    }
+
     protected function get_file_object($file_name)
     {
         if ($this->is_valid_file_object($file_name)) {
             $file = new stdClass();
             $file->name = $file_name;
+            self::fillInFile($file);
             $file->size = $this->get_file_size(
                     $this->get_upload_path($file_name)
             );
@@ -351,6 +397,7 @@ class UploadHandler {
         if (!is_dir($upload_dir)) {
             return array();
         }
+
         return array_values(array_filter(array_map(
                                 array($this, $iteration_method),
                                 scandir($upload_dir)
@@ -1083,6 +1130,7 @@ class UploadHandler {
             if ($file_size === $file->size) {
                 $file->url = $this->get_download_url($file->name);
                 if ($this->is_valid_image_file($file_path)) {
+                    $GLOBALS['blueimp_uploads'][] = $file->name;
                     $this->handle_image_file($file_path, $file);
                 }
             } else {
@@ -1360,6 +1408,7 @@ class UploadHandler {
                         $file = $this->get_upload_path($file_name, $version);
                         if (is_file($file)) {
                             unlink($file);
+                            $GLOBALS['blueimp_delete'][] = $file_name;
                         }
                     }
                 }

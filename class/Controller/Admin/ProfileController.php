@@ -56,6 +56,9 @@ class ProfileController extends \Http\Controller {
     {
         \always\Factory\ProfileFactory::post($request, $this->profile,
                 $this->parent);
+        if ($request->isVar('save_published')) {
+            $this->profile->setApproved(true);
+        }
         \always\Factory\ProfileFactory::save($this->profile);
     }
 
