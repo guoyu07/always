@@ -94,9 +94,19 @@ class GalleryController extends \Http\Controller {
                 echo $images;
                 exit();
             case 'caption':
-                echo 'hello';
+                $this->saveCaption($request);
                 exit();
         }
+    }
+
+    private function saveCaption($request)
+    {
+        if (!$request->isVar('caption')) {
+            throw new \Exception('Caption variable is not set.');
+        }
+        $image = \always\Factory\ImageFactory::getImageById($request->getVar('image_id'));
+        $image->setCaption($request->getVar('caption'));
+        \ResourceFactory::saveResource($image);
     }
 
     private function plugUploads($file_string)

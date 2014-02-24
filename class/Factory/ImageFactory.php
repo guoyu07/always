@@ -26,7 +26,20 @@ EOF;
         }
 
         return implode("\n", $cnt);
+    }
 
+    public static function getImageById($id)
+    {
+        if (empty($id)) {
+            throw new \Exception('Missing image id');
+        }
+        $id = (int)$id;
+        $db = \Database::newDB();
+        $db->addTable('always_image')->addFieldConditional('id', $id);
+        $result = $db->selectOneRow();
+        $image = new \always\Resource\Image;
+        $image->setVars($result);
+        return $image;
     }
 }
 

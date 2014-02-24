@@ -93,8 +93,9 @@
         <textarea class="form-control caption" data-image-id="{%=file.id%}" data-profile-id="{%=file.profile_id%}" placeholder="Type image caption here">{%=file.caption%}</textarea>
         </td>
         <td>
-        <button class="delete" data-type="{%=file.deleteType%}" data-url="{%=file.deleteUrl%}&profile_id={%=file.profile_id%}&image_id={%=file.id%}"{% if (file.deleteWithCredentials) { %} data-xhr-fields='{"withCredentials":true}'{% } %}>Delete</button>
-        <input type="checkbox" name="delete" value="1" class="toggle">
+        <a href="javascript:void()" class="btn btn-sm btn-default">Save caption</a><br />
+        <button class="btn btn-sm btn-danger delete" data-type="{%=file.deleteType%}" data-url="{%=file.deleteUrl%}&profile_id={%=file.profile_id%}&image_id={%=file.id%}"{% if (file.deleteWithCredentials) { %} data-xhr-fields='{"withCredentials":true}'{% } %}>Delete</button>
+        <input type="checkbox" name="delete" value="1" class="toggle" />
         </td>
         </tr>
         {% } %}

@@ -16,6 +16,7 @@ class Image extends \Resource {
 
     public function __construct()
     {
+        parent::__construct();
         $this->table = 'always_image';
         $this->path = new \Variable\File(null, 'path');
         $this->caption = new \Variable\TextOnly(null, 'caption');

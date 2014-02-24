@@ -53,7 +53,7 @@ $(function() {
     });
 
     function initCaption() {
-        
+
         $('.caption').focusout(function() {
             var caption = $(this).val();
             var profile_id = $(this).data('profileId');
