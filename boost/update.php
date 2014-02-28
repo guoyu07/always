@@ -19,6 +19,19 @@ function always_update(&$content, $current_version)
 - Added image gallery.
 </pre>
 EOF;
+
+        case version_compare($current_version, '1.1.1', '<'):
+            $db = \Database::newDB();
+            $tbl = $db->addTable('always_image');
+            $dt = new \Database\Datatype\Smallint($tbl, 'main');
+            $dt->add();
+            $content[] = <<<EOF
+<pre>1.1.1 updates
+-------------------
+- Added main image selection.
+</pre>
+EOF;
+
     }
     return true;
 }

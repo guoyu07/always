@@ -53,9 +53,22 @@ class GalleryController extends \Http\Controller {
 
     public function getJsonView($data, \Request $request)
     {
-        $this->upload($request);
-        exit();
+        $cmd = $request->shiftCommand();
+        if (empty($cmd)) {
+            $cmd = 'upload';
+        }
+
+        switch ($cmd) {
+            case 'upload':
+                $this->upload($request);
+                exit();
+
+            case 'pickdefault':
+                $this->pickDefault($request);
+                exit();
+        }
     }
+
 
     public function getHtmlView($data, \Request $request)
     {
@@ -97,6 +110,28 @@ class GalleryController extends \Http\Controller {
                 $this->saveCaption($request);
                 exit();
         }
+    }
+
+    private function pickDefault($request)
+    {
+        if (!$request->isVar('image_id')) {
+            throw new \Exception('Missing image id');
+        }
+        $db = \Database::newDB();
+        $t1 = $db->addTable('always_image');
+        $t1->addValue('main', 0);
+        $db->update();
+
+        $image_id = $request->getVar('image_id');
+        $image = \always\Factory\ImageFactory::getImageById($image_id);
+        $image->setMain(true);
+        \ResourceFactory::saveResource($image);
+
+        $db = \Database::newDB();
+        $t1 = $db->addTable('always_profile');
+        $t1->addFieldConditional('original_id', $image->getProfileId());
+        $t1->addValue('profile_pic', $image->getUrl());
+        $db->update();
     }
 
     private function saveCaption($request)

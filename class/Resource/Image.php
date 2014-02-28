@@ -13,6 +13,7 @@ class Image extends \Resource {
     protected $caption;
     protected $profile_id;
     protected $parent_id;
+    protected $main;
 
     public function __construct()
     {
@@ -24,6 +25,7 @@ class Image extends \Resource {
         $this->profile_id->setRange(1);
         $this->parent_id = new \Variable\Integer(0, 'parent_id');
         $this->parent_id->setRange(1);
+        $this->main = new \Variable\Bool(false, 'main');
     }
 
     public function setPath($path)
@@ -33,7 +35,16 @@ class Image extends \Resource {
 
     public function getPath()
     {
-        $this->path->get();
+        return $this->path->get();
+    }
+
+    /**
+     * Returns url of image
+     * @return type
+     */
+    public function getUrl()
+    {
+        return PHPWS_HOME_HTTP . 'images/always/profile' . $this->getProfileId() . '/' . $this->path->get();
     }
 
     public function setCaption($caption)
@@ -43,7 +54,7 @@ class Image extends \Resource {
 
     public function getCaption()
     {
-        $this->caption->get();
+        return $this->caption->get();
     }
 
     public function setProfileId($id)
@@ -53,7 +64,7 @@ class Image extends \Resource {
 
     public function getProfileId()
     {
-        $this->profile_id->get();
+        return $this->profile_id->get();
     }
 
     public function setParentId($id)
@@ -63,7 +74,17 @@ class Image extends \Resource {
 
     public function getParentId()
     {
-        $this->parent_id->get();
+        return $this->parent_id->get();
+    }
+
+    public function setMain($main)
+    {
+        $this->main->set($main);
+    }
+
+    public function getMain()
+    {
+        return $this->main->get();
     }
 
 }

@@ -12,8 +12,8 @@
     </div>
 
     <div class="col-lg-3 col-md-3 col-sm-3">
-        <div class="profile-pic bg-tl">
-            <a class="fancybox" rel="group" href="<?=$profile_pic?>"><img class="img-responsive" src="<?=$profile_pic?>" style="width:263px"></a>
+        <div id="profile-main-pic" class="profile-pic bg-tl">
+            <a rel="group" href="<?=$profile_pic?>"><img class="img-responsive" src="<?=$profile_pic?>" style="width:263px"></a>
         </div>
     </div>
     <div class="col-lg-9 col-md-9 col-sm-9">
@@ -50,13 +50,13 @@
     </div>
 </div>
 
-<?php if ($admin){ echo $image_button ;} ?>
 <?php if (isset($gallery)): ?>
 <div class="row">
     <div class="border-box top-box"></div>
     <div class="story bg-tl">
         <div id="links">
             <?=$gallery?>
+            <div class="clearfix"></div>
         </div>
         <div id="blueimp-gallery" class="blueimp-gallery blueimp-gallery-controls">
             <div class="slides"></div>
@@ -80,5 +80,14 @@ document.getElementById('links').onclick = function (event) {
         links = this.getElementsByTagName('a');
     blueimp.Gallery(links, options);
 };
+document.getElementById('profile-main-pic').onclick = function (event) {
+    event = event || window.event;
+    var target = event.target || event.srcElement,
+        link = target.src ? target.parentNode : target,
+        options = {index: link, event: event, continuous:true},
+        links = this.getElementsByTagName('a');
+    blueimp.Gallery(links, options);
+};
 </script>
 <?php endif; ?>
+<?php if ($admin){ echo '<hr />' . $image_button ;} ?>

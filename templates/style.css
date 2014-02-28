@@ -9,3 +9,9 @@
 .student-name a {
     color : black;
 }
+
+#links a {
+    display:block;
+    float : left;
+    margin : 0px 3px 3px 0px;
+}

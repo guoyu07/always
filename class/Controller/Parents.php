@@ -80,7 +80,7 @@ class Parents extends \Http\Controller {
                 break;
 
             case 'gallery':
-                return $this->gallery();
+                return $this->gallery($request);
                 break;
         }
     }
@@ -95,6 +95,11 @@ class Parents extends \Http\Controller {
             // no profile was ever created or it hasn't been approved
             \Server::forward('/always/parent/edit');
         }
+    }
+
+    private function gallery()
+    {
+
     }
 
     private function publish(\Request $request)

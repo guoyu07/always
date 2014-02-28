@@ -94,6 +94,8 @@
         </td>
         <td>
         <a href="javascript:void()" class="btn btn-sm btn-default">Save caption</a><br />
+        <button class="{% if (file.main != 0) { %}hide{% } %} btn btn-sm btn-primary profile-button" data-image-id="{%=file.id%}">Make profile</button><br />
+
         <button class="btn btn-sm btn-danger delete" data-type="{%=file.deleteType%}" data-url="{%=file.deleteUrl%}&profile_id={%=file.profile_id%}&image_id={%=file.id%}"{% if (file.deleteWithCredentials) { %} data-xhr-fields='{"withCredentials":true}'{% } %}>Delete</button>
         <input type="checkbox" name="delete" value="1" class="toggle" />
         </td>

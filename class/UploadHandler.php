@@ -352,6 +352,7 @@ class UploadHandler {
                 $file->caption = $img['caption'];
                 $file->id = $img['id'];
                 $file->profile_id = $img['profile_id'];
+                $file->main = $img['main'];
             }
         } elseif (is_array($file)) {
             if (isset($image_properties[$file['name']])) {
@@ -359,6 +360,7 @@ class UploadHandler {
                 $file['caption'] = $img['caption'];
                 $file['id'] = $img['id'];
                 $file['profile_id'] = $img['profile_id'];
+                $file['main'] = $img['main'];
             }
         } else {
             exit('File not object or array');

@@ -35,6 +35,7 @@ $(function() {
                 );
     }).on('fileuploadfinished', function(e, data) {
         initCaption();
+        initDefault();
     });
 
     // Load existing files:
@@ -52,6 +53,19 @@ $(function() {
                 .call(this, $.Event('done'), {result: result});
     });
 
+    function initDefault() {
+        $('.profile-button').click(function() {
+            $.get('always/admin/gallery/pickdefault', {
+                image_id: $(this).data('imageId')
+            }, function(data) {
+                //console.log(data);
+            }).always(function(){
+                window.location.reload();
+            });
+            return false;
+        });
+    }
+
     function initCaption() {
 
         $('.caption').focusout(function() {
@@ -62,8 +76,8 @@ $(function() {
                 caption: caption,
                 profile_id: profile_id,
                 image_id: image_id
-            }, function(data){
-                console.log(data);
+            }, function(data) {
+                //console.log(data);
             });
         });
     }
