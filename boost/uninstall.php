@@ -13,11 +13,15 @@ function always_uninstall(&$content)
     if ($db->tableExists('always_parents')) {
         $tbl = $db->buildTable('always_parents');
         $tbl->drop();
-   }
+    }
     if ($db->tableExists('always_profile')) {
         $tbl = $db->buildTable('always_profile');
         $tbl->drop();
-   }
+    }
+    if ($db->tableExists('always_images')) {
+        $tbl = $db->buildTable('always_images');
+        $tbl->drop();
+    }
 
     return true;
 }

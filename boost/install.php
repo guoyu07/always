@@ -17,9 +17,11 @@ function always_install(&$content)
 
         $profile = new \always\Resource\Profile;
         $pt = $profile->createTable($db);
-
         $index = new \Database\Index($pt->getDataType('pname'), 'pname');
         $index->create();
+
+        $image = new \always\Resource\Image;
+        $img = $image->createTable($db);
     } catch (\Exception $e) {
         if (isset($st) && $db->tableExists($st->getName())) {
             $st->drop();

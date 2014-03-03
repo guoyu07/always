@@ -14,6 +14,7 @@ class Image extends \Resource {
     protected $profile_id;
     protected $parent_id;
     protected $main;
+    protected $table = 'always_parents';
 
     public function __construct()
     {

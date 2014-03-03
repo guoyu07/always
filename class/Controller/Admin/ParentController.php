@@ -46,7 +46,7 @@ class ParentController extends \Http\Controller {
         $this->parent->setFirstName($request->getVar('first_name'));
         $this->parent->setLastName($request->getVar('last_name'));
         if (!$this->parent->isSaved()) {
-            $new_user_id = $this->createNewUser($request->getVar('username'));
+            $new_user_id = $this->createNewUser($request->getVar('username'), $this->parent->getFullName());
             $this->parent->setUserId($new_user_id);
         }
         \ResourceFactory::saveResource($this->parent);
@@ -126,7 +126,7 @@ class ParentController extends \Http\Controller {
         \Session::getInstance()->always_message = $message;
     }
 
-    private function createNewUser($username)
+    private function createNewUser($username, $full_name)
     {
         $username = strtolower($username);
         $user = new \PHPWS_User;
@@ -136,6 +136,7 @@ class ParentController extends \Http\Controller {
         }
 
         $user->username = $user->email = $username;
+        $user->display_name = $full_name;
 
         if ($user->isDuplicateEmail()) {
             throw new \always\UserException('Email address already in system');

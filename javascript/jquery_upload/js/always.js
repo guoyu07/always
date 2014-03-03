@@ -55,7 +55,7 @@ $(function() {
 
     function initDefault() {
         $('.profile-button').click(function() {
-            $.get('always/admin/gallery/pickdefault', {
+            $.get(command_dir + 'gallery/pickdefault', {
                 image_id: $(this).data('imageId')
             }, function(data) {
                 //console.log(data);
@@ -72,12 +72,12 @@ $(function() {
             var caption = $(this).val();
             var profile_id = $(this).data('profileId');
             var image_id = $(this).data('imageId');
-            $.post('always/admin/gallery/caption', {
+            $.post(command_dir + 'gallery/caption', {
                 caption: caption,
                 profile_id: profile_id,
                 image_id: image_id
             }, function(data) {
-                //console.log(data);
+                console.log(data);
             });
         });
     }

@@ -21,8 +21,20 @@ class Parents extends \Http\Controller {
         return $response;
     }
 
+    public function delete(\Request $request)
+    {
+        $gallery = new \always\Gallery;
+        $gallery->delete($request);
+    }
+
     public function post(\Request $request)
     {
+
+        $cmd = $request->shiftCommand();
+        if ($cmd == 'gallery') {
+            return $this->gallery($request);
+        }
+
         $this->loadCurrentParent();
         $this->loadProfile($request);
 
@@ -53,15 +65,26 @@ class Parents extends \Http\Controller {
     private function loadCurrentParent()
     {
         $this->parent = \always\Factory\ParentFactory::getCurrentParent();
+        if (!$this->parent->getUserId()) {
+            throw new Exception('Unknown parent, check user account');
+        }
+    }
+
+    public function getJsonView($data, \Request $request)
+    {
+        $cmd = $request->shiftCommand();
+        if ($cmd == 'gallery') {
+            return $this->gallery($request);
+        }
     }
 
     public function getHtmlView($data, \Request $request)
     {
         $cmd = $request->shiftCommand();
-
         if (empty($cmd)) {
             $cmd = 'view';
         }
+
         switch ($cmd) {
             case 'list':
                 return $this->listing();
@@ -97,9 +120,40 @@ class Parents extends \Http\Controller {
         }
     }
 
-    private function gallery()
+    private function gallery($request)
     {
+        $cmd = $request->shiftCommand();
+        $gallery = new \always\Gallery;
+        if (empty($cmd)) {
+            $cmd = 'form';
+        }
+        switch ($cmd) {
+            case 'form':
+                return $gallery->form($request);
+                break;
 
+            /*
+              case 'upload':
+              $gallery->upload($request);
+              exit();
+             */
+            case 'pickdefault':
+                $gallery->pickDefault($request);
+                exit();
+
+
+            case 'upload':
+                ob_start();
+                $gallery->upload($request);
+                $result = ob_get_clean();
+                $images = $gallery->plugUploads($result);
+                echo $images;
+                exit();
+
+            case 'caption':
+                $gallery->saveCaption($request);
+                exit();
+        }
     }
 
     private function publish(\Request $request)

@@ -266,7 +266,7 @@ EOF;
 
         $parent = ParentFactory::getParentById($profile->getParentId());
         if ($parent->getUserId() == \Current_User::getId()) {
-            $data['image_button'] = '<a class="btn btn-default" href="always/parent/gallery">Update gallery</a>';
+            $data['image_button'] = '<a class="btn btn-default" href="always/parent/gallery?profile_id=' . $profile->getId() . '">Update gallery</a>';
             $data['parent_update'] = true;
             $data['admin'] = true;
             if (!$profile->isApproved()) {
