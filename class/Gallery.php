@@ -18,8 +18,9 @@ class Gallery {
         $this->loadProfile($request);
         javascript('jquery');
         javascript('jquery_ui');
+        $source_http = PHPWS_SOURCE_HTTP;
         $local_url = \Server::getSiteUrl();
-        $always_url = $local_url . 'mod/always/javascript/';
+        $always_url = PHPWS_SOURCE_HTTP . 'mod/always/javascript/';
         if (\Current_User::allow('always')) {
             $command_dir = $local_url . 'always/admin/';
             $upload_url = $local_url . 'always/admin/gallery/upload/?profile_id=' . $this->original_id;
@@ -32,7 +33,7 @@ class Gallery {
 <!--[if IE]>
 <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 <![endif]-->
-<link rel="stylesheet" href="{$local_url}javascript/jquery_ui/css/smoothness/jquery-ui-1.10.3.custom.min.css" id="theme">
+<link rel="stylesheet" href="{$source_http}javascript/jquery_ui/css/smoothness/jquery-ui-1.10.3.custom.min.css" id="theme">
 <link rel="stylesheet" href="{$always_url}gallery/css/blueimp-gallery.min.css">
 <link rel="stylesheet" href="{$always_url}jquery_upload/css/jquery.fileupload.css">
 <style>j
