@@ -242,17 +242,12 @@ class ProfileFactory {
     {
         javascript('jquery');
         javascript('jquery_ui');
-        /*
-          $script = <<<EOF
-          <script type="text/javascript" src="' . PHPWS_SOURCE_HTTP . 'mod/always/javascript/fancybox/source/jquery.fancybox.js"></script>
-          <script type="text/javascript" src="' . PHPWS_SOURCE_HTTP . 'mod/always/javascript/fancybox/load.js"></script>
-          <link rel="stylesheet" type="text/css" href="' . PHPWS_SOURCE_HTTP . 'mod/always/javascript/fancybox/source/jquery.fancybox.css?v=2.1.5" media="screen" />
-          EOF;
-         *
-         */
+
+        $source = PHPWS_SOURCE_HTTP;
+
         $script = <<<EOF
-<link rel="stylesheet" href="mod/always/javascript/gallery/css/blueimp-gallery.min.css">
-<link rel="stylesheet" href="mod/always/javascript/gallery/css/blueimp-gallery-indicator.css">
+<link rel="stylesheet" href="{$source}mod/always/javascript/gallery/css/blueimp-gallery.min.css">
+<link rel="stylesheet" href="{$source}mod/always/javascript/gallery/css/blueimp-gallery-indicator.css">
 EOF;
         \Layout::addJSHeader($script);
         $data = $profile->getStringVars();
