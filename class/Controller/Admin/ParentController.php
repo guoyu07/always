@@ -242,7 +242,6 @@ class ParentController extends \Http\Controller {
         $username = $users->addField('username');
         $db->addConditional($db->createConditional($users->getField('id'),
                         $parent->getField('user_id')));
-        $db->setGroupBy($last_name);
         $pager = new \DatabasePager($db);
         $pager->setHeaders(array('last_name', 'first_name', 'username'));
         $tbl_headers['last_name'] = $last_name;
@@ -251,6 +250,7 @@ class ParentController extends \Http\Controller {
         $pager->setTableHeaders($tbl_headers);
         $pager->setId('parent-list');
         $pager->setRowIdColumn('id');
+        $pager->showQuery();
         return $pager->getJson();
     }
 

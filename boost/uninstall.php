@@ -18,8 +18,8 @@ function always_uninstall(&$content)
         $tbl = $db->buildTable('always_profile');
         $tbl->drop();
     }
-    if ($db->tableExists('always_images')) {
-        $tbl = $db->buildTable('always_images');
+    if ($db->tableExists('always_image')) {
+        $tbl = $db->buildTable('always_image');
         $tbl->drop();
     }
 

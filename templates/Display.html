@@ -13,7 +13,9 @@
 
     <div class="col-lg-3 col-md-3 col-sm-3">
         <div id="profile-main-pic" class="profile-pic bg-tl">
+            <?php if (!empty($profile_pic)): ?>
             <a rel="group" href="<?=$profile_pic?>"><img class="img-responsive" src="<?=$profile_pic?>" style="width:263px"></a>
+            <?php endif; ?>
         </div>
     </div>
     <div class="col-lg-9 col-md-9 col-sm-9">
@@ -70,7 +72,7 @@
     </div>
     <div class="border-box bottom-box"></div>
 </div>
-<script src="//localhost/phpwebsite/mod/always/javascript/gallery/js/blueimp-gallery.min.js"></script>
+<script src="<?=PHPWS_SOURCE_HTTP?>mod/always/javascript/gallery/js/blueimp-gallery.min.js"></script>
 <script>
 document.getElementById('links').onclick = function (event) {
     event = event || window.event;

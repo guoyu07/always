@@ -132,11 +132,6 @@ class Parents extends \Http\Controller {
                 return $gallery->form($request);
                 break;
 
-            /*
-              case 'upload':
-              $gallery->upload($request);
-              exit();
-             */
             case 'pickdefault':
                 $gallery->pickDefault($request);
                 exit();
