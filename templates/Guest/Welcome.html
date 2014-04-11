@@ -9,17 +9,17 @@
 
         <div class="row text-center student-search">
             <div class="col-lg-6 text-center">
-                <form>
+                <form method="get" action="always/search/">
                     <div class="input-group" style="width:250px; margin: 0px auto">
-                        <input type="text" class="form-control" fname="always_search" disabled="disabled" placeholder="Search (disabled)" id="always-search" />
+                        <input type="text" class="form-control" name="always_search" placeholder="Search" id="always-search" />
                         <span class="input-group-btn">
-                            <button class="btn btn-default" disabled="disabled">Find</button>
+                            <input type="submit" class="btn btn-default" value="Find" />
                         </span>
                     </div>
                 </form>
             </div>
             <div class="col-lg-6 text-center">
-                <a href="always/list" class="btn btn-default">Browse Student Profiles</a>
+                <a href="always/list/" class="btn btn-default">View Student Profiles</a>
             </div>
         </div>
 

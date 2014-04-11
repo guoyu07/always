@@ -38,7 +38,7 @@ class ProfileFactory {
      * $profile_table = Database\Table object using always_profile
      * @return array
      */
-    public static function getLastVersionDB($approved = null)
+    public static function getLastVersionDB($approved = null, $search_by = null)
     {
         $ssdb = \Database::newDB();
         $sstbl = $ssdb->addTable('always_profile');
@@ -48,6 +48,16 @@ class ProfileFactory {
         $sstbl->addField($exp);
         if (!is_null($approved)) {
             $sstbl->addFieldConditional('approved', (int) (bool) $approved);
+        }
+        if (!is_null($search_by)) {
+            if (preg_match('/[\w\s]/', $search_by)) {
+                //$sstbl->addFieldConditional('pname', '%' . $search_by . '%', 'like');
+                $search_by = strtolower($search_by);
+                $cond = $ssdb->createConditional('soundex(first_name)', new \Database\Expression("soundex('$search_by')"));
+                $cond2 = $ssdb->createConditional('soundex(last_name)', new \Database\Expression("soundex('$search_by')"));
+                $cond3 = $ssdb->createConditional($cond, $cond2, 'or');
+                $ssdb->addConditional($cond3);
+            }
         }
         $ssdb->setGroupBy($pid);
 
@@ -66,9 +76,9 @@ class ProfileFactory {
         return array('db' => $db, 'profile_table' => $profile_table);
     }
 
-    public static function getProfiles($approved = null)
+    public static function getProfiles($approved = null, $search_by = null)
     {
-        extract(self::getLastVersionDB($approved));
+        extract(self::getLastVersionDB($approved, $search_by));
         $profile_table->addOrderBy($profile_table->getField('last_name'));
         return self::buildProfileArray($db);
     }

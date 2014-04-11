@@ -26,6 +26,7 @@ class Guest extends \Http\Controller {
         if (empty($cmd)) {
             $cmd = 'welcome';
         }
+
         switch ($cmd) {
             case 'welcome':
                 return self::welcome();
@@ -33,6 +34,10 @@ class Guest extends \Http\Controller {
 
             case 'list':
                 return $this->listing();
+                break;
+
+            case 'search':
+                return $this->listing($_GET['always_search']);
                 break;
 
             default:
@@ -62,9 +67,9 @@ class Guest extends \Http\Controller {
         }
     }
 
-    private function listing()
+    private function listing($search_by=null)
     {
-        $profiles = \always\Factory\ProfileFactory::getProfiles(true);
+        $profiles = \always\Factory\ProfileFactory::getProfiles(true, $search_by);
         $data['profiles'] = $profiles;
         $template = new \Template();
         $template->setModuleTemplate('always', 'Guest/List.html');
