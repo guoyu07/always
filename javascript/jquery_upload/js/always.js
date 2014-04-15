@@ -28,12 +28,14 @@ $(function() {
         previewMaxHeight: 80,
         previewCrop: true
     }).on('fileuploadprogressall', function(e, data) {
+        showError(data);
         var progress = parseInt(data.loaded / data.total * 100, 10);
         $('.progress-bar').css(
                 'width',
                 progress + '%'
                 );
     }).on('fileuploadfinished', function(e, data) {
+        showError(data);
         initCaption();
         initDefault();
     });
@@ -49,6 +51,7 @@ $(function() {
     }).always(function() {
         $(this).removeClass('fileupload-processing');
     }).done(function(result) {
+        showError(result);
         $(this).fileupload('option', 'done')
                 .call(this, $.Event('done'), {result: result});
     });
@@ -77,8 +80,28 @@ $(function() {
                 profile_id: profile_id,
                 image_id: image_id
             }, function(data) {
-                console.log(data);
+                //console.log(data);
             });
         });
     }
 });
+
+function showError(data) {
+    var message = '';
+
+    if (data.error !== undefined) {
+        if (data.error.exception !== undefined) {
+            if (showExceptions) {
+                message = data.error.exception.xdebug_message;
+                $('body').html('<table>' + message + '</table>');
+                return;
+            } else {
+                message = 'An error occurred. Cannot continue.';
+            }
+        } else {
+            message = data.error;
+        }
+        $('.form-error p').html(message);
+        $('.form-error').show();
+    }
+}

@@ -105,7 +105,6 @@ EOF;
             'upload_dir' => $upload_dir,
             'upload_url' => $upload_url
         );
-
         $this->upload_handler = new \UploadHandler($options);
     }
 

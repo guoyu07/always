@@ -621,8 +621,10 @@ class UploadHandler {
 
     protected function gd_destroy_image_object($file_path)
     {
-        $image = @$this->image_objects[$file_path];
-        return $image && imagedestroy($image);
+        if (isset($this->image_objects[$file_path])) {
+            $image = $this->image_objects[$file_path];
+            return $image && imagedestroy($image);
+        }
     }
 
     protected function gd_imageflip($image, $mode)
@@ -669,7 +671,10 @@ class UploadHandler {
         if ($exif === false) {
             return false;
         }
-        $orientation = intval(@$exif['Orientation']);
+        if (!isset($exif['Orientation'])) {
+            return false;
+        }
+        $orientation = intval($exif['Orientation']);
         if ($orientation < 2 || $orientation > 8) {
             return false;
         }
