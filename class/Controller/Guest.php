@@ -74,7 +74,7 @@ class Guest extends \Http\Controller {
             if (preg_match('/[^\w\s\-\']/', $search_by)) {
                 $search_by = null;
             } else {
-                $data['limiter'] = 'Searching by name "' . $search_by . '"';
+                $data['limiter'] = 'Viewing by name "' . $search_by . '"';
             }
         } else {
             $search_by = null;
@@ -85,21 +85,35 @@ class Guest extends \Http\Controller {
             if (!is_numeric($class_date)) {
                 $class_date = null;
             } else {
-                $data['limiter'] = 'Searching by class date "' . $class_date . '"';
+                $data['limiter'] = 'Viewing by class date "' . $class_date . '"';
             }
         } else {
             $class_date = null;
         }
 
+        if ($request->isVar('letter')) {
+            $letter = substr($request->getVar('letter'), 0, 1);
+                $data['limiter'] = 'Viewing last names beginning with "' . $letter . '"';
+        } else {
+            $letter = null;
+        }
+
         $db = \Database::newDB();
         $ap = $db->addTable('always_profile', null, false);
-        $db->addExpression(new \Database\Expression('distinct(' . $ap->getField('class_date'). ')'));
+        $db->addExpression(new \Database\Expression('distinct(' . $ap->getField('class_date') . ')'));
         $ap->addOrderBy('class_date');
-        while($result = $db->selectColumn()) {
+        while ($result = $db->selectColumn()) {
             $data['options'][] = $result;
         }
 
-        $profiles = \always\Factory\ProfileFactory::getProfiles(true, $search_by, $class_date);
+        $profiles = \always\Factory\ProfileFactory::getProfiles(true,
+                        $search_by, $class_date, $letter);
+
+        for ($i = 65; $i < 91; $i++) {
+            $alphabet[] = '<a style="margin:0px 5px 5px 0px" href="always/list/?letter=' . chr($i) . '">' . chr($i) . '</a>';
+        }
+
+        $data['alphabet'] = implode(' ', $alphabet);
         $data['profiles'] = $profiles;
         $template = new \Template();
         $template->setModuleTemplate('always', 'Guest/List.html');
