@@ -1,8 +1,31 @@
-<div class="bg-tl" style="min-height : 100px; padding : 8px">
-    <div class="row text-center student-search">
-        <div class="pull-left">
-            <form method="get" action="always/search/">
-                <div class="input-group" style="width:250px; margin: 0px auto">
+<style>
+    div.bg-tl {
+        min-height : 100px; padding : 8px;
+    }
+    div.search-option {
+        margin-right : 10px; max-width : 300px; height : 40px;
+    }
+</style>
+
+<script type="text/javascript">
+    $(window).load(function() {
+        $('#class-date-selection').change(function() {
+            var class_date = $('option:selected', this).val();
+            if (class_date > 0) {
+                window.location.href = 'always/list/?class_date=' + class_date;
+            }
+        });
+    });
+</script>
+
+<div class="bg-tl">
+    <?php if(isset($limiter)): ?>
+    <h2><?=$limiter?></h2><hr />
+    <?php endif; ?>
+    <div class="student-search">
+        <div class="pull-left search-option">
+            <form method="get" action="always/list/">
+                <div class="input-group">
                     <input type="text" class="form-control" name="always_search" placeholder="Search" id="always-search" />
                     <span class="input-group-btn">
                         <input type="submit" class="btn btn-default" value="Find" />
@@ -10,33 +33,33 @@
                 </div>
             </form>
         </div>
-        <div>
+        <div class="pull-left search-option">
+            <div class="input-group">
+                <select name='class_dates' id='class-date-selection' class="form-control">
+                    <?php if (!empty($options)) { ?>
+                    <option value="0">View profiles by class date</option>
+                    <?php foreach ($options as $opt): ?>
+                    <option><?=$opt?></option>
+                    <?php endforeach;
+                    }
+                    ?>
+                </select>
+            </div>
+        </div>
+        <div class="pull-left search-option">
             <a href="always/list/" class="btn btn-default">View All Student Profiles</a>
         </div>
     </div>
+    <div class="clearfix">&nbsp;</div>
     <?php
     if (empty($profiles)) {
-    echo '<p>No profiles found.</p></div>';
-    return;
-    }
-    $column_count = 0;
-    ?>
-    <table class="table table-striped">
-        <?php
-        foreach ($profiles as $p):
-        if ($column_count == 0) {
-        echo '<tr>';
-        }
-        ?>
-        <td><a style="color: black" href="always/<?=$p->getPname();?>"><?=$p->getFullName();?></a></td>
-        <?php
-        if ($column_count >= 2) {
-        echo '</tr>';
-        $column_count = 0;
-        } else {
-        $column_count++;
-        }
-        endforeach;
-        ?>
-    </table>
+    echo '<p>No profiles found.</p>';
+    } else {
+    foreach ($profiles as $p): ?>
+    <div class="pull-left" style="background-color:black; min-width: 250px; margin : 0px 8px 8px 0px;padding:6px 8px 4px 8px; border:1px white solid">
+        <a style="color: white; font-weight:bold" href="always/<?=$p->getPname();?>"><?=$p->getFullName(), ' - Class of ' . $p->getClassDate();?></a>
+    </div>
+    <?php endforeach;
+    } ?>
+    <div class="clearfix">&nbsp;</div>
 </div>

@@ -33,11 +33,11 @@ class Guest extends \Http\Controller {
                 break;
 
             case 'list':
-                return $this->listing();
+                return $this->listing($request);
                 break;
 
             case 'search':
-                return $this->listing($_GET['always_search']);
+                return $this->listing($request);
                 break;
 
             default:
@@ -67,9 +67,39 @@ class Guest extends \Http\Controller {
         }
     }
 
-    private function listing($search_by=null)
+    private function listing(\Request $request)
     {
-        $profiles = \always\Factory\ProfileFactory::getProfiles(true, $search_by);
+        if ($request->isVar('always_search')) {
+            $search_by = $request->getVar('always_search');
+            if (preg_match('/[^\w\s\-\']/', $search_by)) {
+                $search_by = null;
+            } else {
+                $data['limiter'] = 'Searching by name "' . $search_by . '"';
+            }
+        } else {
+            $search_by = null;
+        }
+
+        if ($request->isVar('class_date')) {
+            $class_date = $request->getVar('class_date');
+            if (!is_numeric($class_date)) {
+                $class_date = null;
+            } else {
+                $data['limiter'] = 'Searching by class date "' . $class_date . '"';
+            }
+        } else {
+            $class_date = null;
+        }
+
+        $db = \Database::newDB();
+        $ap = $db->addTable('always_profile', null, false);
+        $db->addExpression(new \Database\Expression('distinct(' . $ap->getField('class_date'). ')'));
+        $ap->addOrderBy('class_date');
+        while($result = $db->selectColumn()) {
+            $data['options'][] = $result;
+        }
+
+        $profiles = \always\Factory\ProfileFactory::getProfiles(true, $search_by, $class_date);
         $data['profiles'] = $profiles;
         $template = new \Template();
         $template->setModuleTemplate('always', 'Guest/List.html');

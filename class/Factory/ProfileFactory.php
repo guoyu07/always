@@ -38,7 +38,7 @@ class ProfileFactory {
      * $profile_table = Database\Table object using always_profile
      * @return array
      */
-    public static function getLastVersionDB($approved = null, $search_by = null)
+    public static function getLastVersionDB($approved = null, $search_by = null, $class_date)
     {
         $ssdb = \Database::newDB();
         $sstbl = $ssdb->addTable('always_profile');
@@ -49,14 +49,24 @@ class ProfileFactory {
         if (!is_null($approved)) {
             $sstbl->addFieldConditional('approved', (int) (bool) $approved);
         }
+
+        if (!is_null($class_date)) {
+            $class_date = (int)$class_date;
+            $sstbl->addFieldConditional('class_date', (int) $class_date);
+        }
+
         if (!is_null($search_by)) {
             if (preg_match('/[\w\s]/', $search_by)) {
                 //$sstbl->addFieldConditional('pname', '%' . $search_by . '%', 'like');
                 $search_by = strtolower($search_by);
-                $cond = $ssdb->createConditional('soundex(first_name)', new \Database\Expression("soundex('$search_by')"));
+                $cond1 = $ssdb->createConditional('soundex(first_name)', new \Database\Expression("soundex('$search_by')"));
                 $cond2 = $ssdb->createConditional('soundex(last_name)', new \Database\Expression("soundex('$search_by')"));
-                $cond3 = $ssdb->createConditional($cond, $cond2, 'or');
-                $ssdb->addConditional($cond3);
+                $cond3 = $ssdb->createConditional('first_name', '%' . $search_by . '%', 'like');
+                $cond4 = $ssdb->createConditional('last_name', '%' . $search_by . '%', 'like');
+                $cond5 = $ssdb->createConditional($cond1, $cond2, 'or');
+                $cond6 = $ssdb->createConditional($cond3, $cond4, 'or');
+                $cond7 = $ssdb->createConditional($cond5, $cond6, 'or');
+                $ssdb->addConditional($cond7);
             }
         }
         $ssdb->setGroupBy($pid);
@@ -76,9 +86,9 @@ class ProfileFactory {
         return array('db' => $db, 'profile_table' => $profile_table);
     }
 
-    public static function getProfiles($approved = null, $search_by = null)
+    public static function getProfiles($approved = null, $search_by = null, $class_date=null)
     {
-        extract(self::getLastVersionDB($approved, $search_by));
+        extract(self::getLastVersionDB($approved, $search_by, $class_date));
         $profile_table->addOrderBy($profile_table->getField('last_name'));
         return self::buildProfileArray($db);
     }
