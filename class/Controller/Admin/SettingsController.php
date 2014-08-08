@@ -23,6 +23,8 @@ class SettingsController extends \Http\Controller {
     {
         $ce = $request->getVar('contact_email');
         \Settings::set('always', 'contact_email', $ce);
+        $cp = $request->getVar('contact_phone');
+        \Settings::set('always', 'contact_phone', $cp);
         $response = new \Http\SeeOtherResponse(\Server::getCurrentUrl(false));
         $this->sendMessage('Settings updated.');
         return $response;
@@ -30,7 +32,7 @@ class SettingsController extends \Http\Controller {
 
     public function getHtmlView($data, \Request $request)
     {
-        $this->loadMenu();
+        $this->loadMenu('settings');
         $cmd = $request->shiftCommand();
 
         if (empty($cmd)) {
@@ -58,6 +60,8 @@ class SettingsController extends \Http\Controller {
         $form->appendCSS('bootstrap');
         $form->addEmail('contact_email',
                 \Settings::get('always', 'contact_email'))->setRequired();
+        $form->addTextField('contact_phone',
+                \Settings::get('always', 'contact_phone'))->setRequired();
         $form->addSubmit('submit', 'Save settings');
         $vars = $form->getInputStringArray();
         $template = new \Template($vars);
@@ -65,9 +69,9 @@ class SettingsController extends \Http\Controller {
         return $template;
     }
 
-    private function loadMenu()
+    private function loadMenu($active)
     {
-        $this->menu = new \always\Menu('profiles');
+        $this->menu = new \always\Menu($active);
     }
 
     private function sendMessage($message)

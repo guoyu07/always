@@ -45,6 +45,7 @@ class Module extends \Module implements \SettingDefaults{
     public function getSettingDefaults()
     {
         $array['contact_email'] = 'replaceme@notarealsite.com';
+        $array['contact_phone'] = '828-555-1212';
         return $array;
     }
 

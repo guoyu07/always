@@ -77,6 +77,7 @@ class ParentController extends \Http\Controller {
         $vars['password'] = $this->parent->getPassword();
         $vars['site_address'] = 'http://always.appstate.edu';
         $vars['contact_email'] = \Settings::get('always', 'contact_email');
+        $vars['contact_phone'] = \Settings::get('always', 'contact_phone');
         $template = new \Template($vars);
         $template->setModuleTemplate('always', 'Admin/Parents/Invitation.html');
 

@@ -65,7 +65,7 @@ class ProfileController extends \Http\Controller {
     public function getHtmlView($data, \Request $request)
     {
         \Layout::addStyle('always', 'Admin/Profile/style.css');
-        $this->loadMenu();
+        $this->loadMenu('profile');
         $cmd = $request->shiftCommand();
 
         if (empty($cmd)) {

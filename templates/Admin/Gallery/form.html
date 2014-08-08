@@ -21,14 +21,6 @@
                 <span class="fileupload-process"></span>
             </div>
             <!-- The global progress state -->
-            <div class="fileupload-progress">
-                <!-- The global progress bar -->
-                <div class="progress progress-striped active" role="progressbar" aria-valuemin="0" aria-valuemax="100">
-                    <div class="progress-bar progress-bar-success" style="width:0%;"></div>
-                </div>
-                <!-- The extended global progress state -->
-                <div class="progress-extended">&nbsp;</div>
-            </div>
         </div>
         <!-- The table listing the files available for upload/download -->
         <table class="table table-striped" role="presentation"><tbody class="files"></tbody></table>
@@ -74,14 +66,14 @@
     <script id="template-download" type="text/x-tmpl">
         {% for (var i=0, file; file=o.files[i]; i++) { %}
         <tr class="template-download">
-        <td>
+        <td {% if (file.main != 0) { %}style="background-color:#428bca;"{% } %}>
         <span class="preview">
         {% if (file.thumbnailUrl) { %}
         <a href="{%=file.url%}" title="{%=file.name%}" download="{%=file.name%}" data-gallery><img src="{%=file.thumbnailUrl%}"></a>
         {% } %}
         </span>
         </td>
-        <td>
+        <td {% if (file.main != 0) { %}style="background-color:#428bca;"{% } %}>
         <p class="name">
         <a href="{%=file.url%}" title="{%=file.name%}" download="{%=file.name%}" {%=file.thumbnailUrl?'data-gallery':''%}>{%=file.name%}</a>
         </p>
@@ -89,10 +81,10 @@
         <div><span class="error">Error</span> {%=file.error%}</div>
         {% } %}
         </td>
-        <td>
+        <td {% if (file.main != 0) { %}style="background-color:#428bca;"{% } %}>
         <textarea class="form-control caption" data-image-id="{%=file.id%}" data-profile-id="{%=file.profile_id%}" placeholder="Type image caption here">{%=file.caption%}</textarea>
         </td>
-        <td>
+        <td {% if (file.main != 0) { %}style="background-color:#428bca;"{% } %}>
         <a href="javascript:void()" class="btn btn-sm btn-default">Save caption</a><br />
         <button class="{% if (file.main != 0) { %}hide{% } %} btn btn-sm btn-primary profile-button" data-image-id="{%=file.id%}">Make profile</button><br />
 
