@@ -1106,6 +1106,7 @@ class UploadHandler {
         $file = new stdClass();
         $file->name = $this->get_file_name($uploaded_file, $name, $size, $type,
                 $error, $index, $content_range);
+        $file->name = preg_replace('@[^\w\-\.\s]@i', '', $file->name);
         $file->size = $this->fix_integer_overflow(intval($size));
         $file->type = $type;
         if ($this->validate($uploaded_file, $file, $error, $index)) {
