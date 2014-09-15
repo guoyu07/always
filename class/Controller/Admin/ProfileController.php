@@ -239,6 +239,7 @@ class ProfileController extends \Http\Controller {
     {
         extract(\always\Factory\ProfileFactory::getLastVersionDB(false));
         $profile_table->addFieldConditional('submitted', 1);
+        $profile_table->addFieldConditional('approved', 0);
         $pager = new \DatabasePager($db);
         $pager->setCallback(array('\always\Controller\Admin\ProfileController', 'parseRow'));
         $pager->setHeaders(array('last_name' => 'Full name', 'last_updated' => 'Last updated'));
