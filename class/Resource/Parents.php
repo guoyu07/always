@@ -10,12 +10,6 @@ namespace always\Resource;
 class Parents extends \Resource {
 
     /**
-     * Id for each Parent
-     * @var Variable\Integer
-     */
-    protected $id;
-
-    /**
      * Id of user account tied to Parent
      * @var integer
      */

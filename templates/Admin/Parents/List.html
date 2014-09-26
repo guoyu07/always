@@ -34,7 +34,7 @@
 
 <div id="parent-options" style="display:none">
     <?php echo $form_start ?>
-    <?php echo $username_group ?>
+    <div id="username-container"><?php echo $username_group ?></div>
     <table class="table">
         <tr>
             <td>
@@ -44,7 +44,7 @@
                     <?php echo $last_name_group ?>
                 </fieldset>
             </td>
-            <td>
+            <td id="profile-form-container">
                 <fieldset id="profile-form">
                     <legend>Student information</legend>
                     <?php echo $student_first_name_group ?>

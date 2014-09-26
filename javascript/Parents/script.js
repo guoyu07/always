@@ -6,6 +6,8 @@ $(window).load(function() {
 function parent() {
     this.parent_id = 0;
     this.display_title = 'Create new parent account';
+    this.username_group = null;
+    this.profile_form = null;
 
     this.init = function() {
         $this = this;
@@ -38,8 +40,14 @@ function parent() {
             $('#last_name').val('');
             $('#username').val('');
             $('#parent-id').val(0);
-            $('.username-group').show();
-            $('#profile-form').show();
+            if (parent.username_group) {
+                parent.username_group.appendTo('#username-container');
+                parent.username_group = null;
+            }
+            if (parent.profile_form) {
+                parent.profile_form.appendTo('#profile-form-container');
+                parent.profile_form = null;
+            }
             $('#profiles').hide();
             $('#parent-options').dialog({title: $this.dialog_title});
             $('#parent-options').dialog('open');
@@ -79,7 +87,6 @@ function parent() {
                 'command': 'edit_parent',
                 'parent_id': row_id
             }, function(data) {
-                console.log(data);
                 if (data.error !== undefined) {
                     $('body').append('<table>' + data.error.exception.xdebug_message + '</table>');
                 }
@@ -89,8 +96,8 @@ function parent() {
                 $this.dialog_title = 'Update parent account';
                 $('#first_name').val(data['first_name']);
                 $('#last_name').val(data['last_name']);
-                $('.username-group').hide();
-                $('#profile-form').hide();
+                parent.username_group = $('.username-group').detach();
+                parent.profile_form = $('#profile-form').detach();
                 $('#profiles').show();
                 $('#parent-id').val(row_id);
                 $('#parent-options').dialog({title: $this.dialog_title});

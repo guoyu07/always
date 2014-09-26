@@ -43,22 +43,31 @@ class ParentController extends \Http\Controller {
 
     private function saveParent(\Request $request)
     {
+        $new_parent = !$this->parent->isSaved();
+
         $this->parent->setFirstName($request->getVar('first_name'));
         $this->parent->setLastName($request->getVar('last_name'));
-        if (!$this->parent->isSaved()) {
-            $new_user_id = $this->createNewUser($request->getVar('username'), $this->parent->getFullName());
+        // If new parent, create an user account and get the new user id to save
+        // with the parent
+        if ($new_parent) {
+            $new_user_id = $this->createNewUser($request->getVar('username'),
+                    $this->parent->getFullName());
             $this->parent->setUserId($new_user_id);
         }
         \ResourceFactory::saveResource($this->parent);
 
-        $profile = new \always\Resource\Profile;
-        $profile->setFirstName($request->getVar('student_first_name'));
-        $profile->setMiddleName($request->getVar('student_middle_name'));
-        $profile->setLastName($request->getVar('student_last_name'));
-        $profile->setClassDate($request->getVar('class_date'));
-        $profile->setParentId($this->parent->getId());
+        // If new parent, save the profile information. Profile will NOT be
+        // included on a parent update.
+        if ($new_parent) {
+            $profile = new \always\Resource\Profile;
+            $profile->setFirstName($request->getVar('student_first_name'));
+            $profile->setMiddleName($request->getVar('student_middle_name'));
+            $profile->setLastName($request->getVar('student_last_name'));
+            $profile->setClassDate($request->getVar('class_date'));
+            $profile->setParentId($this->parent->getId());
 
-        \always\Factory\ProfileFactory::save($profile);
+            \always\Factory\ProfileFactory::save($profile);
+        }
     }
 
     private function emailParent()
@@ -103,8 +112,12 @@ class ParentController extends \Http\Controller {
         try {
             switch ($request->getVar('command')) {
                 case 'save':
+                    // if parent is new, email them
+                    $email_new_parent = !$this->parent->isSaved();
                     $this->saveParent($request);
-                    $this->emailParent();
+                    if ($email_new_parent) {
+                        $this->emailParent();
+                    }
                     break;
 
                 case 'delete':
@@ -209,9 +222,9 @@ class ParentController extends \Http\Controller {
         $form->addHidden('command', 'save');
         $form->addHidden('parent_id', 0);
 
-        //if (!$parent->getId()) {
-        $form->addEmail('username')->setPlaceholder("Enter parent's email address")->setRequired();
-        //}
+        if (!$parent->getId()) {
+            $form->addEmail('username')->setPlaceholder("Enter parent's email address")->setRequired();
+        }
 
         $form->getSingleInput('first_name')->setRequired();
         $form->getSingleInput('last_name')->setRequired();
