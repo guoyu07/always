@@ -38,7 +38,7 @@ class ProfileFactory {
      * $profile_table = Database\Table object using always_profile
      * @return array
      */
-    public static function getLastVersionDB()
+    public static function getLastVersionDB($approved=null)
     {
         $ssdb = \Database::newDB();
         $sstbl = $ssdb->addTable('always_profile');
@@ -52,6 +52,10 @@ class ProfileFactory {
 
         $db = \Database::newDB();
         $profile_table = $db->addTable('always_profile');
+        if (!is_null($approved)) {
+            $approved_cond = $approved ? 1 : 0;
+            $sstbl->addFieldConditional('approved', $approved_cond);
+        }
 
         $c1 = new \Database\Conditional($db,
                 $subselect->getField('original_id'),
@@ -286,6 +290,7 @@ EOF;
         $data['approve'] = false;
         $data['publish'] = false;
         $data['admin'] = false;
+        $data['diff'] = false;
         $data['parent_update'] = false;
         $data['profile_id'] = $profile->getId();
         $data['original_id'] = $profile->getOriginalId();
@@ -308,6 +313,10 @@ EOF;
             $data['admin'] = true;
             if (!$profile->isApproved() && $profile->isSubmitted()) {
                 $data['approve'] = true;
+                $version = $profile->getVersion();
+                if ($version >= 1) {
+                    $data['diff'] = true;
+                }
             }
         }
 
