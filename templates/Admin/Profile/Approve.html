@@ -1,7 +1,8 @@
 <?php if ($needs_approval): ?>
 <div class="approve-buttons">
-    <a style="margin-bottom: 5px; width:100px" class="btn btn-default btn-success" href="always/admin/profiles/approve?profile_id=<?=$profile_id?>"><i class="fa fa-flag-checkered"></i> Approve</a>
-    <?php if ($can_diff):?><a style="width:100px" class="btn btn-default" href="always/admin/profiles/diff?profile_id=<?=$profile_id;?>"><i class="fa fa-exchange"></i> View Diff</a><?php endif;?>
+    <a style="margin-bottom: 5px; width:200px" class="btn btn-default" href="always/admin/profiles/"><i class="fa fa-list-ul"></i> Show unapproved</a>
+    <a style="margin-bottom: 5px; width:200px" class="btn btn-default btn-success" href="always/admin/profiles/approve?profile_id=<?=$profile_id?>"><i class="fa fa-flag-checkered"></i> Approve</a>
+    <?php if ($can_diff):?><a style="width:200px" class="btn btn-default" href="always/admin/profiles/diff?profile_id=<?=$profile_id;?>"><i class="fa fa-exchange"></i> Diff</a><?php endif;?>
 </div>
 <?php endif; ?>
 <?= $content; ?>
