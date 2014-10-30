@@ -306,7 +306,8 @@ class ParentController extends \Http\Controller {
         $content[] = '<ul style="margin-left:4px;padding-left:0px;list-style-type:none">';
         foreach ($profiles as $p) {
             $content[] = '<li>' . $p->getFullName() . ' - Class of ' . $p->getClassDate() . ' <a class="btn btn-default btn-sm" href="always/admin/profiles/update?parent_id='
-                    . $parent_id . '&amp;original_id=' . $p->getOriginalId() . '">Update</a> <a class="btn btn-default btn-sm" href="always/' . $p->getPName() . '">View</a></li>';
+                    . $parent_id . '&amp;original_id=' . $p->getOriginalId() . '">Update</a> <a class="btn btn-default btn-sm" href="always/admin/profiles/view?profile_id='.$p->getId() .'">View</a></li>';
+
         }
         $content[] = '</ul>';
         return implode("\n", $content);
