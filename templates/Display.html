@@ -27,7 +27,8 @@
                 <div class="text-center">
                     <? if ($parent_update): ?><a href="always/parent/update?original_id=<?=$original_id?>"><button class="btn btn-primary btn-default"><i class="fa fa-pencil"></i> Update</button></a><br /><? endif; ?>
                     <? if ($publish): ?><a href="always/parent/publish?profile_id=<?=$profile_id?>"><button class="btn btn-success btn-default"><i class="fa fa-flag-checkered"></i> Publish</button></a><br /><? endif; ?>
-                    <? if ($approve): ?><a href="always/admin/profiles/approve?profile_id=<?=$profile_id?>"><button class="btn btn-success btn-default"><i class="fa fa-flag-checkered"></i> Approve</button></a><? endif; ?>
+                    <? if ($approve): ?><a href="always/admin/profiles/approve?profile_id=<?=$profile_id?>"><button class="btn btn-success btn-default"><i class="fa fa-flag-checkered"></i> Approve</button></a><br /><? endif; ?>
+                    <? if ($diff): ?><a href="always/admin/profiles/diff?profile_id=<?=$profile_id?>"><button class="btn btn-default"><span class="fa fa-exchange"></span> Diff</button></a><? endif; ?>
                 </div>
             </div>
             <?php endif; ?>
