@@ -265,7 +265,7 @@ class ProfileController extends \Http\Controller {
 EOF;
         if ($row['version'] > 1) {
             $row['action'] .= <<<EOF
-<a href="always/admin/profiles/diff?profile_id=$profile_id" class="btn btn-sm btn-default">Diff</a>
+ <a href="always/admin/profiles/diff?profile_id=$profile_id" class="btn btn-sm btn-default"><i class="fa fa-exchange"></i> Diff</a>
 EOF;
         }
         return $row;
